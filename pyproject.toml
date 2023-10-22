@@ -1,6 +1,6 @@
 [project]
 name = "fastapi-deferred-init"
-version = "0.1.0"
+version = "0.2.0"
 description = "Faster FastAPI start-up time for Projects with many nested routers"
 authors = [
     {name = "Jan Vollmer",email = "jan@vllmr.dev"},
