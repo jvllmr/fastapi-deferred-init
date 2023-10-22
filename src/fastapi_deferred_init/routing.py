@@ -1,8 +1,9 @@
 import inspect
 import typing as t
 from enum import Enum, IntEnum
+from typing import Any, Callable, Dict, List, Sequence, Type
 
-from fastapi import Response, params, routing
+from fastapi import params, routing
 from fastapi._compat import ModelField, lenient_issubclass
 from fastapi.datastructures import Default, DefaultPlaceholder
 from fastapi.dependencies.utils import (
@@ -11,7 +12,8 @@ from fastapi.dependencies.utils import (
     get_parameterless_sub_dependant,
     get_typed_return_annotation,
 )
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
+from fastapi.routing import APIRoute
 from fastapi.types import IncEx
 from fastapi.utils import (
     create_cloned_field,
@@ -19,7 +21,8 @@ from fastapi.utils import (
     generate_unique_id,
     is_body_allowed_for_status_code,
 )
-from starlette.routing import compile_path, get_name, request_response
+from starlette.routing import BaseRoute, compile_path, get_name, request_response
+from starlette.types import ASGIApp, Lifespan
 
 from .lib import DeferringProxy
 
@@ -160,9 +163,62 @@ class DeferringAPIRoute(routing.APIRoute):
             self.response_fields = {}
 
         assert callable(endpoint), "An endpoint must be a callable"
-        self.dependant = get_route_dependant(
-            self, path=self.path_format, call=self.endpoint
+        self.dependant = DeferringProxy(
+            lambda: get_route_dependant(  # type: ignore
+                self, path=self.path_format, call=self.endpoint
+            )
         )
 
         self.body_field = DeferringProxy(lambda: get_body_field(dependant=self.dependant, name=self.unique_id))  # type: ignore
         self.app = DeferringProxy(lambda: request_response(self.get_route_handler()))  # type: ignore
+
+    def __getattribute__(self, name: str):
+        obj = object.__getattribute__(self, name)
+        if hasattr(obj, "__get__"):
+            return obj.__get__(self, type(self))
+        return obj
+
+
+class DeferringAPIRouter(routing.APIRouter):
+    def __init__(
+        self,
+        *,
+        prefix: str = "",
+        tags: List[str | Enum] | None = None,
+        dependencies: Sequence[params.Depends] | None = None,
+        default_response_class: Type[Response] = Default(JSONResponse),
+        responses: Dict[int | str, Dict[str, Any]] | None = None,
+        callbacks: List[BaseRoute] | None = None,
+        routes: List[BaseRoute] | None = None,
+        redirect_slashes: bool = True,
+        default: ASGIApp | None = None,
+        dependency_overrides_provider: Any | None = None,
+        route_class: Type[APIRoute] = DeferringAPIRoute,
+        on_startup: Sequence[Callable[[], Any]] | None = None,
+        on_shutdown: Sequence[Callable[[], Any]] | None = None,
+        lifespan: Lifespan[Any] | None = None,
+        deprecated: bool | None = None,
+        include_in_schema: bool = True,
+        generate_unique_id_function: Callable[[APIRoute], str] = Default(
+            generate_unique_id
+        ),
+    ) -> None:
+        super().__init__(
+            prefix=prefix,
+            tags=tags,
+            dependencies=dependencies,
+            default_response_class=default_response_class,
+            responses=responses,
+            callbacks=callbacks,
+            routes=routes,
+            redirect_slashes=redirect_slashes,
+            default=default,
+            dependency_overrides_provider=dependency_overrides_provider,
+            route_class=route_class,
+            on_startup=on_startup,
+            on_shutdown=on_shutdown,
+            lifespan=lifespan,
+            deprecated=deprecated,
+            include_in_schema=include_in_schema,
+            generate_unique_id_function=generate_unique_id_function,
+        )

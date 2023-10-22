@@ -13,6 +13,11 @@ base_module = ast.Module(
             names=[ast.alias(name="JSONResponse")],
             level=0,
         ),
+        ast.ImportFrom(
+            module="fastapi_deferred_init",
+            names=[ast.alias(name="DeferringAPIRouter")],
+            level=0,
+        ),
         ast.Assign(
             targets=[ast.Name(id="dependency0", ctx=ast.Store())],
             value=ast.Lambda(
@@ -53,12 +58,14 @@ def gen_func_def(n=1, last=False):
     )
 
 
-def gen_router(n=2, last=False):
+def gen_router(n=2, last=False, use_lib=True):
     return [
         ast.Assign(
             targets=[ast.Name(id=f"router{'' if last else n}", ctx=ast.Store())],
             value=ast.Call(
-                func=ast.Name(id="APIRouter", ctx=ast.Load()),
+                func=ast.Name(
+                    id="DeferringAPIRouter" if use_lib else "APIRouter", ctx=ast.Load()
+                ),
                 args=[],
                 keywords=[
                     ast.keyword(
@@ -146,7 +153,7 @@ def get_tree(n=1000):
     return module
 
 
-def create_dependency(n=1000):
+def create_code(n=1000):
     tree = get_tree(n)
 
     with open("tests/data/code.py", "w") as f:

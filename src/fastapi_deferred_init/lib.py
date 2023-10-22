@@ -17,12 +17,11 @@ class DeferringProxy(t.Generic[T]):
         self.__call = call
 
     def __get_populated_value(self) -> T:
-        raise Exception()
         if isinstance(self.__value, NotPopulated):
             self.__value = self.__call()
         return self.__value
 
-    def __get__(self, *_) -> T:
+    def __get__(self, obj, objtype=None) -> T:
         return self.__get_populated_value()
 
     def __getattr__(self, name: str):

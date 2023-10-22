@@ -1,4 +1,4 @@
-# fastapi-deferring-init
+# fastapi-deferred-init
 
 > **WARNING**: This is the very first draft of this project and might not work at all. I only published it to test it in bigger projects of mine.
 
@@ -9,4 +9,4 @@ That is because every router re-calculates the routes defined by a nested router
 
 ## The Solution
 
-This library provides a modified APIRoute that defers the calculation of values to the first actual attribute access. This also applies to the top-level router, which means that the route is only fully initialized when an API Endpoint is accessed the first time. Utilities for quickly monkey-patching an existing FastAPI application are also provided.
+This library provides a modified APIRoute that defers the calculation of values to the first actual attribute access. A router which uses the route as a default is also provided.
