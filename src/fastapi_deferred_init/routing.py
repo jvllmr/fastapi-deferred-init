@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import inspect
 import typing as t
 from enum import Enum, IntEnum
-from typing import Any, Callable, Dict, List, Sequence, Type
+from typing import Any, Callable, Sequence
 
 from fastapi import params, routing
 from fastapi._compat import ModelField, lenient_issubclass
@@ -184,16 +186,16 @@ class DeferringAPIRouter(routing.APIRouter):
         self,
         *,
         prefix: str = "",
-        tags: List[str | Enum] | None = None,
+        tags: list[str | Enum] | None = None,
         dependencies: Sequence[params.Depends] | None = None,
-        default_response_class: Type[Response] = Default(JSONResponse),
-        responses: Dict[int | str, Dict[str, Any]] | None = None,
-        callbacks: List[BaseRoute] | None = None,
-        routes: List[BaseRoute] | None = None,
+        default_response_class: type[Response] = Default(JSONResponse),
+        responses: dict[int | str, dict[str, Any]] | None = None,
+        callbacks: list[BaseRoute] | None = None,
+        routes: list[BaseRoute] | None = None,
         redirect_slashes: bool = True,
         default: ASGIApp | None = None,
         dependency_overrides_provider: Any | None = None,
-        route_class: Type[APIRoute] = DeferringAPIRoute,
+        route_class: type[APIRoute] = DeferringAPIRoute,
         on_startup: Sequence[Callable[[], Any]] | None = None,
         on_shutdown: Sequence[Callable[[], Any]] | None = None,
         lifespan: Lifespan[Any] | None = None,
