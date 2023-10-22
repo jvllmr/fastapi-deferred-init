@@ -1,6 +1,6 @@
 # fastapi-deferred-init
 
-> **WARNING**: This is the very first draft of this project and might not work at all. I only published it to test it in bigger projects of mine.
+> **WARNING**: Early release. Might need more testing. Feel free to add tests if you have issues
 
 ## The Problem
 
