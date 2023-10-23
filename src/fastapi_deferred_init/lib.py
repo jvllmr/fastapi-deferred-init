@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import typing as t
 
 T = t.TypeVar("T")
@@ -9,9 +7,10 @@ class NotPopulated:
     pass
 
 
+# TODO: remove someday
 class DeferringProxy(t.Generic[T]):
     __call: t.Callable[[], T]
-    __value: T | NotPopulated = NotPopulated()
+    __value: t.Union[T, NotPopulated] = NotPopulated()
 
     def __init__(self, call: t.Callable[[], T]) -> None:
         self.__call = call

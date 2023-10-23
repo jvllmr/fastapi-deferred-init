@@ -1,12 +1,10 @@
-from __future__ import annotations
-
 import inspect
 import typing as t
 from enum import Enum, IntEnum
-from typing import Any, Callable, Sequence
+from functools import cached_property
 
 from fastapi import params, routing
-from fastapi._compat import ModelField, lenient_issubclass
+from fastapi._compat import lenient_issubclass
 from fastapi.datastructures import Default, DefaultPlaceholder
 from fastapi.dependencies.utils import (
     get_body_field,
@@ -26,20 +24,10 @@ from fastapi.utils import (
 from starlette.routing import BaseRoute, compile_path, get_name, request_response
 from starlette.types import ASGIApp, Lifespan
 
-from .lib import DeferringProxy
-
-
-def get_route_dependant(route: routing.APIRoute, *args, **kwargs):
-    dependant = get_dependant(*args, **kwargs)
-    for depends in route.dependencies[::-1]:
-        dependant.dependencies.insert(
-            0,
-            get_parameterless_sub_dependant(depends=depends, path=route.path_format),
-        )
-    return dependant
-
 
 class DeferringAPIRoute(routing.APIRoute):
+    _getattr: t.ClassVar[t.Callable[[t.Any, str], t.Any]]
+
     def __init__(
         self,
         path: str,
@@ -121,33 +109,43 @@ class DeferringAPIRoute(routing.APIRoute):
             assert is_body_allowed_for_status_code(
                 status_code
             ), f"Status code {status_code} must not have a response body"
-            response_name = "Response_" + self.unique_id
-            self.response_field = DeferringProxy(
-                lambda: create_response_field(  # type: ignore
-                    name=response_name,
-                    type_=self.response_model,
-                    mode="serialization",
-                )
-            )
-            # Create a clone of the field, so that a Pydantic submodel is not returned
-            # as is just because it's an instance of a subclass of a more limited class
-            # e.g. UserInDB (containing hashed_password) could be a subclass of User
-            # that doesn't have the hashed_password. But because it's a subclass, it
-            # would pass the validation and be returned as is.
-            # By being a new field, no inheritance will be passed as is. A new model
-            # will always be created.
-            # TODO: remove when deprecating Pydantic v1
-            self.secure_cloned_response_field: t.Optional[ModelField] = DeferringProxy(
-                lambda: create_cloned_field(self.response_field)
-            )  # type: ignore
-        else:
-            self.response_field = None  # type: ignore
-            self.secure_cloned_response_field = None
+
         self.dependencies = list(dependencies or [])
         self.description = description or inspect.cleandoc(self.endpoint.__doc__ or "")
-        # if a "form feed" character (page break) is found in the description text,
-        # truncate description text to the content preceding the first "form feed"
+
         self.description = self.description.split("\f")[0].strip()
+
+        assert callable(endpoint), "An endpoint must be a callable"
+
+    @cached_property
+    def dependant(self):
+        dependant = get_dependant(path=self.path_format, call=self.endpoint)
+
+        for depends in self.dependencies[::-1]:
+            dependant.dependencies.insert(
+                0,
+                get_parameterless_sub_dependant(depends=depends, path=self.path_format),
+            )
+        return dependant
+
+    @cached_property
+    def response_field(self):
+        if self.response_model:
+            response_name = "Response_" + self.unique_id
+            return create_response_field(  # type: ignore
+                name=response_name,
+                type_=self.response_model,
+                mode="serialization",
+            )
+        else:
+            return None
+
+    @cached_property
+    def secure_cloned_response_field(self):
+        return create_cloned_field(self.response_field) if self.response_model else None
+
+    @cached_property
+    def response_fields(self):
         response_fields = {}
         for additional_status_code, response in self.responses.items():
             assert isinstance(response, dict), "An additional response must be a dict"
@@ -157,28 +155,17 @@ class DeferringAPIRoute(routing.APIRoute):
                     additional_status_code
                 ), f"Status code {additional_status_code} must not have a response body"
                 response_name = f"Response_{additional_status_code}_{self.unique_id}"
-                response_field = DeferringProxy(lambda: create_response_field(name=response_name, type_=model))  # type: ignore
+                response_field = create_response_field(name=response_name, type_=model)  # type: ignore
                 response_fields[additional_status_code] = response_field
-        if response_fields:
-            self.response_fields: t.Dict[t.Union[int, str], ModelField] = response_fields  # type: ignore
-        else:
-            self.response_fields = {}
+        return response_fields
 
-        assert callable(endpoint), "An endpoint must be a callable"
-        self.dependant = DeferringProxy(
-            lambda: get_route_dependant(  # type: ignore
-                self, path=self.path_format, call=self.endpoint
-            )
-        )
+    @cached_property
+    def body_field(self):
+        return get_body_field(dependant=self.dependant, name=self.unique_id)
 
-        self.body_field = DeferringProxy(lambda: get_body_field(dependant=self.dependant, name=self.unique_id))  # type: ignore
-        self.app = DeferringProxy(lambda: request_response(self.get_route_handler()))  # type: ignore
-
-    def __getattribute__(self, name: str):
-        obj = object.__getattribute__(self, name)
-        if hasattr(obj, "__get__"):
-            return obj.__get__(self, type(self))
-        return obj
+    @cached_property
+    def app(self):
+        return request_response(self.get_route_handler())
 
 
 class DeferringAPIRouter(routing.APIRouter):
@@ -186,22 +173,22 @@ class DeferringAPIRouter(routing.APIRouter):
         self,
         *,
         prefix: str = "",
-        tags: list[str | Enum] | None = None,
-        dependencies: Sequence[params.Depends] | None = None,
+        tags: t.Optional[list[t.Union[str, Enum]]] = None,
+        dependencies: t.Optional[t.Sequence[params.Depends]] = None,
         default_response_class: type[Response] = Default(JSONResponse),
-        responses: dict[int | str, dict[str, Any]] | None = None,
-        callbacks: list[BaseRoute] | None = None,
-        routes: list[BaseRoute] | None = None,
+        responses: t.Optional[dict[t.Union[int, str], dict[str, t.Any]]] = None,
+        callbacks: t.Optional[list[BaseRoute]] = None,
+        routes: t.Optional[list[BaseRoute]] = None,
         redirect_slashes: bool = True,
-        default: ASGIApp | None = None,
-        dependency_overrides_provider: Any | None = None,
+        default: t.Optional[ASGIApp] = None,
+        dependency_overrides_provider: t.Optional[t.Any] = None,
         route_class: type[APIRoute] = DeferringAPIRoute,
-        on_startup: Sequence[Callable[[], Any]] | None = None,
-        on_shutdown: Sequence[Callable[[], Any]] | None = None,
-        lifespan: Lifespan[Any] | None = None,
-        deprecated: bool | None = None,
+        on_startup: t.Optional[t.Sequence[t.Callable[[], t.Any]]] = None,
+        on_shutdown: t.Optional[t.Sequence[t.Callable[[], t.Any]]] = None,
+        lifespan: t.Optional[Lifespan[t.Any]] = None,
+        deprecated: t.Optional[bool] = None,
         include_in_schema: bool = True,
-        generate_unique_id_function: Callable[[APIRoute], str] = Default(
+        generate_unique_id_function: t.Callable[[APIRoute], str] = Default(
             generate_unique_id
         ),
     ) -> None:

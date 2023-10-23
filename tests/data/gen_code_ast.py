@@ -137,7 +137,7 @@ def gen_router(n=2, last=False, use_lib=True):
     )
 
 
-def get_tree(n=1000):
+def get_tree(n=1000, use_lib=True):
     module = copy.deepcopy(base_module)
     for i in range(1, n + 1):
         module.body.append(gen_func_def(i))
@@ -145,16 +145,16 @@ def get_tree(n=1000):
     module.body.append(gen_func_def(i + 1, True))
 
     for i in range(n):
-        module.body.extend(gen_router(i))
+        module.body.extend(gen_router(i, use_lib=use_lib))
 
-    module.body.extend(gen_router(i + 1, True))
+    module.body.extend(gen_router(i + 1, True, use_lib))
 
     ast.fix_missing_locations(module)
     return module
 
 
-def create_code(n=1000):
-    tree = get_tree(n)
+def create_code(n=1000, use_lib=True):
+    tree = get_tree(n, use_lib)
 
     with open("tests/data/code.py", "w") as f:
         f.write(ast.unparse(tree))
