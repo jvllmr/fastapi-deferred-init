@@ -32,7 +32,7 @@ from .lib import DeferringProxy
 def get_route_dependant(route: routing.APIRoute, *args, **kwargs):
     dependant = get_dependant(*args, **kwargs)
     for depends in route.dependencies[::-1]:
-        route.dependant.dependencies.insert(
+        dependant.dependencies.insert(
             0,
             get_parameterless_sub_dependant(depends=depends, path=route.path_format),
         )
