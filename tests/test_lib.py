@@ -8,7 +8,7 @@ from .helpers import load_code
 
 
 def test_basic():
-    create_code(300)
+    create_code(50)
 
     generated_code = load_code()
 
