@@ -1,5 +1,9 @@
 # fastapi-deferred-init
 
+![PyPI - Downloads](https://img.shields.io/pypi/dd/fastapi-deferred-init)
+[![GitHub license](https://img.shields.io/github/license/jvllmr/fastapi-deferred-init)](https://github.com/jvllmr/fastapi-deferred-init/blob/master/LICENSE)
+![Tests](https://github.com/jvllmr/fastapi-deferred-init/actions/workflows/test.yml/badge.svg)
+
 ## The Problem
 
 When using nested routers in a FastAPI project its start-up time can get long quite fast.

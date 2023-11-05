@@ -1,16 +1,24 @@
 [project]
 name = "fastapi-deferred-init"
-version = "0.2.2"
+version = "0.2.2.post1"
 description = "Faster FastAPI start-up time for Projects with many nested routers"
+keywords = ["fastapi", "speed"]
 authors = [
     {name = "Jan Vollmer",email = "jan@vllmr.dev"},
 ]
 dependencies = [
-    "fastapi>=0.104.0",
+    "fastapi>=0.100.0",
 ]
 requires-python = ">=3.8"
 readme = "README.md"
 license = {text = "MIT"}
+classifiers = [
+    "Framework :: FastAPI",
+    ""
+]
+
+[project.urls]
+Source = "https://github.com/jvllmr/fastapi-deferred-init"
 
 [build-system]
 requires = ["pdm-backend"]
