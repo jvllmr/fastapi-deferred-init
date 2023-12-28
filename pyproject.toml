@@ -26,6 +26,10 @@ build-backend = "pdm.backend"
 
 [tool]
 [tool.pdm]
+ignore_package_warnings = ["pre-commit"]
+
+[tool.pdm.scripts]
+test = "pytest"
 [tool.pdm.dev-dependencies]
 dev = [
     "pytest>=7.4.2",
