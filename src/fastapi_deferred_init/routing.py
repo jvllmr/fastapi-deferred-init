@@ -95,9 +95,9 @@ class DeferringAPIRoute(routing.APIRoute):
             methods = ["GET"]
         self.methods: t.Set[str] = {method.upper() for method in methods}
         if isinstance(generate_unique_id_function, DefaultPlaceholder):
-            current_generate_unique_id: t.Callable[
-                [routing.APIRoute], str
-            ] = generate_unique_id_function.value
+            current_generate_unique_id: t.Callable[[routing.APIRoute], str] = (
+                generate_unique_id_function.value
+            )
         else:
             current_generate_unique_id = generate_unique_id_function
         self.unique_id = self.operation_id or current_generate_unique_id(self)
