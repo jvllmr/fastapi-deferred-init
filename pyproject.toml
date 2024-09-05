@@ -4,7 +4,7 @@ description = "Faster FastAPI start-up time for Projects with many nested router
 keywords = ["fastapi", "speed", "router"]
 authors = [{ name = "Jan Vollmer", email = "jan@vllmr.dev" }]
 dependencies = ["fastapi>=0.110.0"]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 readme = "README.md"
 license = { text = "MIT" }
 classifiers = ["Framework :: FastAPI"]
