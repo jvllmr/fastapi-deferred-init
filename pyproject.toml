@@ -24,7 +24,7 @@ plugins = ["sync-pre-commit-lock"]
 
 [tool.pdm.scripts]
 test = "pytest"
-post_install = {composite = ["pre-commit install", "pdm install --plugins"]}
+post_install = {composite = ["pre-commit install", "pdm install --plugins --frozen-lock"]}
 
 
 [tool.pdm.dev-dependencies]
