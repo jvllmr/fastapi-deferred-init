@@ -163,3 +163,4 @@ cython_debug/
 
 
 tests/data/code.py
+benchmark.json

@@ -25,7 +25,7 @@ ignore_package_warnings = ["pre-commit"]
 [tool.pdm.scripts]
 test = "pytest"
 full_test = {shell= "pytest", env= {FULL_TEST = "true"}}
-benchmark = "pytest --benchmark-json benchmark.json"
+benchmark = {shell= "pytest --benchmark-json benchmark.json", env= {FULL_TEST = "true"}}
 post_install = {composite = ["pre-commit install", "pdm install --plugins --frozen-lock"]}
 
 
