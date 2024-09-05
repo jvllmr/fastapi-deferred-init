@@ -1,4 +1,7 @@
-from fastapi import FastAPI
+import os
+
+import pytest
+from fastapi import APIRouter, FastAPI
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
@@ -8,8 +11,15 @@ from .data.gen_code_ast import create_code
 from .helpers import load_code
 
 
-def test_basic():
-    create_code(50, True)  # switch bool to compare
+def skip_test(use_lib: bool):
+    if not use_lib and not os.getenv("FULL_TEST"):
+        pytest.skip()
+
+
+@pytest.mark.parametrize(["use_lib"], [(True,), (False,)])
+def test_basic(use_lib: bool):
+    skip_test(use_lib=use_lib)
+    create_code(50, use_lib=use_lib)  # switch bool to compare
 
     generated_code = load_code()
 
@@ -28,9 +38,11 @@ def test_basic():
         assert resp.status_code == 200
 
 
-def test_with_pydantic_model():
+@pytest.mark.parametrize(["use_lib"], [(True,), (False,)])
+def test_with_pydantic_model(use_lib: bool):
+    skip_test(use_lib=use_lib)
     app = FastAPI()
-    router = DeferringAPIRouter()
+    router = DeferringAPIRouter() if use_lib else APIRouter()
 
     class Login(BaseModel):
         username: str
