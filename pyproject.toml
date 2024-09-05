@@ -43,3 +43,6 @@ profile = "black"
 
 [tool.pdm.version]
 source = "scm"
+
+[tool.pycln]
+all = true

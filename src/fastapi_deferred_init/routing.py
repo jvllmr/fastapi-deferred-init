@@ -1,14 +1,27 @@
 import inspect
-import typing as t
 from enum import Enum, IntEnum
 from functools import cached_property
+from typing import (
+    Any,
+    Callable,
+    ClassVar,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    Type,
+    Union,
+)
 
 from fastapi import params, routing
-from fastapi._compat import lenient_issubclass
+from fastapi._compat import ModelField, lenient_issubclass
 from fastapi.datastructures import Default, DefaultPlaceholder
 from fastapi.dependencies.utils import (
+    _should_embed_body_fields,
     get_body_field,
     get_dependant,
+    get_flat_dependant,
     get_parameterless_sub_dependant,
     get_typed_return_annotation,
 )
@@ -21,45 +34,47 @@ from fastapi.utils import (
     generate_unique_id,
     is_body_allowed_for_status_code,
 )
-from starlette.routing import BaseRoute, compile_path, get_name, request_response
+from starlette.routing import BaseRoute
+from starlette.routing import Mount as Mount  # noqa
+from starlette.routing import compile_path, get_name, request_response
 from starlette.types import ASGIApp, Lifespan
 
 
 class DeferringAPIRoute(routing.APIRoute):
-    _getattr: t.ClassVar[t.Callable[[t.Any, str], t.Any]]
+    _getattr: ClassVar[Callable[[Any, str], Any]]
 
     def __init__(
         self,
         path: str,
-        endpoint: t.Callable[..., t.Any],
+        endpoint: Callable[..., Any],
         *,
-        response_model: t.Any = Default(None),
-        status_code: t.Optional[int] = None,
-        tags: t.Optional[t.List[t.Union[str, Enum]]] = None,
-        dependencies: t.Optional[t.Sequence[params.Depends]] = None,
-        summary: t.Optional[str] = None,
-        description: t.Optional[str] = None,
+        response_model: Any = Default(None),
+        status_code: Optional[int] = None,
+        tags: Optional[List[Union[str, Enum]]] = None,
+        dependencies: Optional[Sequence[params.Depends]] = None,
+        summary: Optional[str] = None,
+        description: Optional[str] = None,
         response_description: str = "Successful Response",
-        responses: t.Optional[t.Dict[t.Union[int, str], t.Dict[str, t.Any]]] = None,
-        deprecated: t.Optional[bool] = None,
-        name: t.Optional[str] = None,
-        methods: t.Optional[t.Union[t.Set[str], t.List[str]]] = None,
-        operation_id: t.Optional[str] = None,
-        response_model_include: t.Optional[IncEx] = None,
-        response_model_exclude: t.Optional[IncEx] = None,
+        responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
+        deprecated: Optional[bool] = None,
+        name: Optional[str] = None,
+        methods: Optional[Union[Set[str], List[str]]] = None,
+        operation_id: Optional[str] = None,
+        response_model_include: Optional[IncEx] = None,
+        response_model_exclude: Optional[IncEx] = None,
         response_model_by_alias: bool = True,
         response_model_exclude_unset: bool = False,
         response_model_exclude_defaults: bool = False,
         response_model_exclude_none: bool = False,
         include_in_schema: bool = True,
-        response_class: t.Union[t.Type[Response], DefaultPlaceholder] = Default(
+        response_class: Union[Type[Response], DefaultPlaceholder] = Default(
             JSONResponse
         ),
-        dependency_overrides_provider: t.Optional[t.Any] = None,
-        callbacks: t.Optional[t.List[routing.BaseRoute]] = None,
-        openapi_extra: t.Optional[t.Dict[str, t.Any]] = None,
-        generate_unique_id_function: t.Union[
-            t.Callable[[routing.APIRoute], str], DefaultPlaceholder
+        dependency_overrides_provider: Optional[Any] = None,
+        callbacks: Optional[List[BaseRoute]] = None,
+        openapi_extra: Optional[Dict[str, Any]] = None,
+        generate_unique_id_function: Union[
+            Callable[["APIRoute"], str], DefaultPlaceholder
         ] = Default(generate_unique_id),
     ) -> None:
         self.path = path
@@ -93,9 +108,9 @@ class DeferringAPIRoute(routing.APIRoute):
         self.path_regex, self.path_format, self.param_convertors = compile_path(path)
         if methods is None:
             methods = ["GET"]
-        self.methods: t.Set[str] = {method.upper() for method in methods}
+        self.methods: Set[str] = {method.upper() for method in methods}
         if isinstance(generate_unique_id_function, DefaultPlaceholder):
-            current_generate_unique_id: t.Callable[[routing.APIRoute], str] = (
+            current_generate_unique_id: Callable[[APIRoute], str] = (
                 generate_unique_id_function.value
             )
         else:
@@ -105,14 +120,8 @@ class DeferringAPIRoute(routing.APIRoute):
         if isinstance(status_code, IntEnum):
             status_code = int(status_code)
         self.status_code = status_code
-        if self.response_model:
-            assert is_body_allowed_for_status_code(
-                status_code
-            ), f"Status code {status_code} must not have a response body"
-
         self.dependencies = list(dependencies or [])
         self.description = description or inspect.cleandoc(self.endpoint.__doc__ or "")
-
         self.description = self.description.split("\f")[0].strip()
 
         assert callable(endpoint), "An endpoint must be a callable"
@@ -122,11 +131,19 @@ class DeferringAPIRoute(routing.APIRoute):
         dependant = get_dependant(path=self.path_format, call=self.endpoint)
 
         for depends in self.dependencies[::-1]:
-            dependant.dependencies.insert(
+            self.dependant.dependencies.insert(
                 0,
                 get_parameterless_sub_dependant(depends=depends, path=self.path_format),
             )
         return dependant
+
+    @cached_property
+    def _flat_dependant(self):
+        return get_flat_dependant(self.dependant)
+
+    @cached_property
+    def _embed_body_fields(self):
+        return _should_embed_body_fields(self._flat_dependant.body_params)
 
     @cached_property
     def response_field(self):
@@ -141,12 +158,12 @@ class DeferringAPIRoute(routing.APIRoute):
             return None
 
     @cached_property
-    def secure_cloned_response_field(self):
+    def secure_cloned_response_field(self) -> Optional[ModelField]:
         return create_cloned_field(self.response_field) if self.response_model else None
 
     @cached_property
     def response_fields(self):
-        response_fields = {}
+        response_fields: Dict[Union[int, str], ModelField] = {}
         for additional_status_code, response in self.responses.items():
             assert isinstance(response, dict), "An additional response must be a dict"
             model = response.get("model")
@@ -155,13 +172,17 @@ class DeferringAPIRoute(routing.APIRoute):
                     additional_status_code
                 ), f"Status code {additional_status_code} must not have a response body"
                 response_name = f"Response_{additional_status_code}_{self.unique_id}"
-                response_field = create_model_field(name=response_name, type_=model)  # type: ignore
+                response_field = create_model_field(name=response_name, type_=model)
                 response_fields[additional_status_code] = response_field
         return response_fields
 
     @cached_property
     def body_field(self):
-        return get_body_field(dependant=self.dependant, name=self.unique_id)
+        return get_body_field(
+            flat_dependant=self._flat_dependant,
+            name=self.unique_id,
+            embed_body_fields=self._embed_body_fields,
+        )
 
     @cached_property
     def app(self):
@@ -173,22 +194,22 @@ class DeferringAPIRouter(routing.APIRouter):
         self,
         *,
         prefix: str = "",
-        tags: t.Optional[list[t.Union[str, Enum]]] = None,
-        dependencies: t.Optional[t.Sequence[params.Depends]] = None,
+        tags: Optional[list[Union[str, Enum]]] = None,
+        dependencies: Optional[Sequence[params.Depends]] = None,
         default_response_class: type[Response] = Default(JSONResponse),
-        responses: t.Optional[dict[t.Union[int, str], dict[str, t.Any]]] = None,
-        callbacks: t.Optional[list[BaseRoute]] = None,
-        routes: t.Optional[list[BaseRoute]] = None,
+        responses: Optional[dict[Union[int, str], dict[str, Any]]] = None,
+        callbacks: Optional[list[BaseRoute]] = None,
+        routes: Optional[list[BaseRoute]] = None,
         redirect_slashes: bool = True,
-        default: t.Optional[ASGIApp] = None,
-        dependency_overrides_provider: t.Optional[t.Any] = None,
+        default: Optional[ASGIApp] = None,
+        dependency_overrides_provider: Optional[Any] = None,
         route_class: type[APIRoute] = DeferringAPIRoute,
-        on_startup: t.Optional[t.Sequence[t.Callable[[], t.Any]]] = None,
-        on_shutdown: t.Optional[t.Sequence[t.Callable[[], t.Any]]] = None,
-        lifespan: t.Optional[Lifespan[t.Any]] = None,
-        deprecated: t.Optional[bool] = None,
+        on_startup: Optional[Sequence[Callable[[], Any]]] = None,
+        on_shutdown: Optional[Sequence[Callable[[], Any]]] = None,
+        lifespan: Optional[Lifespan[Any]] = None,
+        deprecated: Optional[bool] = None,
         include_in_schema: bool = True,
-        generate_unique_id_function: t.Callable[[APIRoute], str] = Default(
+        generate_unique_id_function: Callable[[APIRoute], str] = Default(
             generate_unique_id
         ),
     ) -> None:
