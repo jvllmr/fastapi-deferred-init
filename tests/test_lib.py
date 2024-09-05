@@ -2,6 +2,7 @@ import os
 
 import pytest
 from fastapi import APIRouter, FastAPI
+from fastapi.routing import APIRoute
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
@@ -19,7 +20,7 @@ def skip_test(use_lib: bool):
 @pytest.mark.parametrize(["use_lib"], [(True,), (False,)])
 def test_basic(use_lib: bool):
     skip_test(use_lib=use_lib)
-    create_code(50, use_lib=use_lib)  # switch bool to compare
+    create_code(100, use_lib=use_lib)  # switch bool to compare
 
     generated_code = load_code()
 
@@ -28,12 +29,12 @@ def test_basic(use_lib: bool):
 
     app.include_router(router)
 
-    assert isinstance(router, DeferringAPIRouter)
+    assert type(router) is (DeferringAPIRouter if use_lib else APIRouter)
     client = TestClient(app)
-    assert len(app.routes) == 54
+    assert len(app.routes) == 104
     for route in app.routes:
         if route in router.routes:
-            assert isinstance(route, DeferringAPIRoute)
+            assert type(route) is (DeferringAPIRoute if use_lib else APIRoute)
         resp = client.get(route.path)
         assert resp.status_code == 200
 

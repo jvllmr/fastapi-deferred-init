@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import importlib
+import sys
 from contextlib import contextmanager
 from cProfile import Profile
 from pstats import SortKey, Stats
@@ -15,4 +18,6 @@ def profiled():
 
 
 def load_code():
+    if "tests.data.code" in sys.modules:
+        del sys.modules["tests.data.code"]
     return importlib.import_module("tests.data.code")
