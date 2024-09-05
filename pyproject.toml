@@ -20,7 +20,7 @@ build-backend = "pdm.backend"
 [tool]
 [tool.pdm]
 ignore_package_warnings = ["pre-commit"]
-plugins = ["sync-pre-commit-lock"]
+# plugins = ["sync-pre-commit-lock"]
 
 [tool.pdm.scripts]
 test = "pytest"
