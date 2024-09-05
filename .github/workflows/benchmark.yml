@@ -2,9 +2,9 @@ name: Benchmark
 
 on:
   push:
-    branches: [dev]
+    branches: [master]
   pull_request:
-    branches: [dev]
+    branches: [master]
 
 permissions:
   # deployments permission to deploy GitHub pages website
