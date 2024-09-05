@@ -18,11 +18,11 @@ def skip_test(use_lib: bool):
 
 
 @pytest.mark.parametrize(["use_lib"], [(True,), (False,)])
-def test_basic(use_lib: bool):
+def test_basic(use_lib: bool, benchmark):
     skip_test(use_lib=use_lib)
-    create_code(100, use_lib=use_lib)  # switch bool to compare
+    create_code(50, use_lib=use_lib)  # switch bool to compare
 
-    generated_code = load_code()
+    generated_code = benchmark(load_code)
 
     app = FastAPI()
     router = generated_code.router
@@ -31,7 +31,7 @@ def test_basic(use_lib: bool):
 
     assert type(router) is (DeferringAPIRouter if use_lib else APIRouter)
     client = TestClient(app)
-    assert len(app.routes) == 104
+    assert len(app.routes) == 54
     for route in app.routes:
         if route in router.routes:
             assert type(route) is (DeferringAPIRoute if use_lib else APIRoute)
