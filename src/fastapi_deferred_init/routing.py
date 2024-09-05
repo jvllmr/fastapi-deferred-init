@@ -17,7 +17,7 @@ from fastapi.routing import APIRoute
 from fastapi.types import IncEx
 from fastapi.utils import (
     create_cloned_field,
-    create_response_field,
+    create_model_field,
     generate_unique_id,
     is_body_allowed_for_status_code,
 )
@@ -132,7 +132,7 @@ class DeferringAPIRoute(routing.APIRoute):
     def response_field(self):
         if self.response_model:
             response_name = "Response_" + self.unique_id
-            return create_response_field(  # type: ignore
+            return create_model_field(  # type: ignore
                 name=response_name,
                 type_=self.response_model,
                 mode="serialization",
@@ -155,7 +155,7 @@ class DeferringAPIRoute(routing.APIRoute):
                     additional_status_code
                 ), f"Status code {additional_status_code} must not have a response body"
                 response_name = f"Response_{additional_status_code}_{self.unique_id}"
-                response_field = create_response_field(name=response_name, type_=model)  # type: ignore
+                response_field = create_model_field(name=response_name, type_=model)  # type: ignore
                 response_fields[additional_status_code] = response_field
         return response_fields
 
