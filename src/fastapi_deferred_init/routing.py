@@ -131,7 +131,7 @@ class DeferringAPIRoute(routing.APIRoute):
         dependant = get_dependant(path=self.path_format, call=self.endpoint)
 
         for depends in self.dependencies[::-1]:
-            self.dependant.dependencies.insert(
+            dependant.dependencies.insert(
                 0,
                 get_parameterless_sub_dependant(depends=depends, path=self.path_format),
             )
@@ -158,7 +158,7 @@ class DeferringAPIRoute(routing.APIRoute):
             return None
 
     @cached_property
-    def secure_cloned_response_field(self) -> Optional[ModelField]:
+    def secure_cloned_response_field(self) -> Optional[ModelField]:  # type: ignore
         return create_cloned_field(self.response_field) if self.response_model else None
 
     @cached_property

@@ -71,7 +71,19 @@ def gen_router(n=2, last=False, use_lib=True):
                     ast.keyword(
                         arg="prefix",
                         value=ast.Constant(value=f"/prefix{'' if last else n}"),
-                    )
+                    ),
+                    ast.keyword(
+                        arg="dependencies",
+                        value=ast.List(
+                            elts=[
+                                ast.Call(
+                                    func=ast.Name(id="Depends", ctx=ast.Load()),
+                                    args=[ast.Name(id="dependency50", ctx=ast.Load())],
+                                    keywords=[],
+                                )
+                            ]
+                        ),
+                    ),
                 ],
             ),
         ),
@@ -87,7 +99,7 @@ def gen_router(n=2, last=False, use_lib=True):
                     defaults=[
                         ast.Call(
                             func=ast.Name(id="Depends", ctx=ast.Load()),
-                            args=[ast.Name(id="dependency", ctx=ast.Load())],
+                            args=[ast.Name(id=f"dependency{n}", ctx=ast.Load())],
                             keywords=[],
                         )
                     ],

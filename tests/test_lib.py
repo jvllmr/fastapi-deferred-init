@@ -5,6 +5,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.routing import APIRoute
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
+from starlette.routing import Route
 
 from fastapi_deferred_init import DeferringAPIRoute, DeferringAPIRouter
 
@@ -35,6 +36,7 @@ def test_basic(use_lib: bool, benchmark):
     for route in app.routes:
         if route in router.routes:
             assert type(route) is (DeferringAPIRoute if use_lib else APIRoute)
+        assert isinstance(route, Route)
         resp = client.get(route.path)
         assert resp.status_code == 200
 
