@@ -78,7 +78,9 @@ def gen_router(n=2, last=False, use_lib=True):
                             elts=[
                                 ast.Call(
                                     func=ast.Name(id="Depends", ctx=ast.Load()),
-                                    args=[ast.Name(id="dependency50", ctx=ast.Load())],
+                                    args=[
+                                        ast.Name(id=f"dependency{n}", ctx=ast.Load())
+                                    ],
                                     keywords=[],
                                 )
                             ]
