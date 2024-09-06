@@ -23,10 +23,10 @@ ignore_package_warnings = ["pre-commit"]
 plugins = ["sync-pre-commit-lock"]
 
 [tool.pdm.scripts]
-test = "pytest"
-full_test = {shell= "pytest", env= {FULL_TEST = "true"}}
-benchmark = {shell= "pytest --benchmark-json benchmark.json", env= {FULL_TEST = "true"}}
-post_install = {composite = ["pre-commit install", "pdm install --plugins --frozen-lock"]}
+test = "pytest tests"
+full_test = {shell= "pytest tests", env= {FULL_TEST = "true"}}
+benchmark = {shell= "pytest tests --benchmark-json benchmark.json", env= {FULL_TEST = "true"}}
+post_install = {composite = ["pre-commit install", "pdm install --plugins --frozen-lock", "pip install -r fastapi/requirements.txt"]}
 
 
 [tool.pdm.dev-dependencies]
@@ -39,6 +39,7 @@ dev = [
     "tuna>=0.5.11",
     "httpx>=0.27.2",
     "pytest-benchmark>=4.0.0",
+    "pip>=24.2",
 ]
 
 [tool.isort]

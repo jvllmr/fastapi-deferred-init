@@ -21,3 +21,11 @@ def load_code():
     if "tests.data.code" in sys.modules:
         del sys.modules["tests.data.code"]
     return importlib.import_module("tests.data.code")
+
+
+def import_via_file_path(module_name: str, file_path: str):
+    # https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly
+    spec = importlib.util.spec_from_file_location(module_name, file_path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)

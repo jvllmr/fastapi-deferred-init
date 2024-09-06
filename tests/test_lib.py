@@ -1,6 +1,8 @@
 import os
 
 import pytest
+from pydantic import BaseModel
+
 from fastapi import APIRouter, FastAPI
 from fastapi.routing import APIRoute
 from fastapi.testclient import TestClient
@@ -10,7 +12,7 @@ from starlette.routing import Route
 from fastapi_deferred_init import DeferringAPIRoute, DeferringAPIRouter
 
 from .data.gen_code_ast import create_code
-from .helpers import load_code
+from .helpers import import_via_file_path, load_code
 
 
 def skip_test(use_lib: bool):
@@ -65,3 +67,18 @@ def test_with_pydantic_model(use_lib: bool):
 
     resp = client.post("/login", json={"username": "jvllmr", "password": "password"})
     assert resp.status_code == 200
+
+
+def test_fastapi_openapi_schema(monkeypatch):
+    monkeypatch.setattr("fastapi.routing.APIRoute", DeferringAPIRoute)
+    monkeypatch.setattr("fastapi.routing.APIRouter", DeferringAPIRouter)
+    import_via_file_path(
+        "fastapi_clone.tests.test_additional_properties",
+        "fastapi/tests/test_additional_properties.py",
+    )
+
+    from fastapi_clone.tests.test_additional_properties import (
+        test_openapi_schema as fastapi_test_openapi_schema,  # type: ignore
+    )
+
+    fastapi_test_openapi_schema()
