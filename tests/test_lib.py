@@ -75,8 +75,17 @@ def test_fastapi_openapi_schema(monkeypatch):
         "fastapi/tests/test_additional_properties.py",
     )
 
+    import_via_file_path(
+        "fastapi_clone.tests.test_openapi_examples",
+        "fastapi/tests/test_openapi_examples.py",
+    )
+
     from fastapi_clone.tests.test_additional_properties import (  # noqa # type: ignore
+        test_openapi_schema as fastapi_test_openapi_schema_additional,
+    )
+    from fastapi_clone.tests.test_openapi_examples import (  # noqa # type: ignore
         test_openapi_schema as fastapi_test_openapi_schema,
     )
 
     fastapi_test_openapi_schema()
+    fastapi_test_openapi_schema_additional()
