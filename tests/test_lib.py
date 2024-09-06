@@ -2,13 +2,11 @@ import os
 
 import pytest
 from pydantic import BaseModel
+from starlette.routing import Route
 
 from fastapi import APIRouter, FastAPI
 from fastapi.routing import APIRoute
 from fastapi.testclient import TestClient
-from pydantic import BaseModel
-from starlette.routing import Route
-
 from fastapi_deferred_init import DeferringAPIRoute, DeferringAPIRouter
 
 from .data.gen_code_ast import create_code
@@ -77,8 +75,8 @@ def test_fastapi_openapi_schema(monkeypatch):
         "fastapi/tests/test_additional_properties.py",
     )
 
-    from fastapi_clone.tests.test_additional_properties import (
-        test_openapi_schema as fastapi_test_openapi_schema,  # type: ignore
+    from fastapi_clone.tests.test_additional_properties import (  # noqa # type: ignore
+        test_openapi_schema as fastapi_test_openapi_schema,
     )
 
     fastapi_test_openapi_schema()
