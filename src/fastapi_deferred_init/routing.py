@@ -14,7 +14,12 @@ from typing import (
     Union,
 )
 
-from fastapi import params, routing
+from starlette.routing import BaseRoute
+from starlette.routing import Mount as Mount  # noqa
+from starlette.routing import compile_path, get_name, request_response
+from starlette.types import ASGIApp, Lifespan
+
+from fastapi import params, routing  # type:ignore
 from fastapi._compat import ModelField, lenient_issubclass
 from fastapi.datastructures import Default, DefaultPlaceholder
 from fastapi.dependencies.utils import (
@@ -34,10 +39,6 @@ from fastapi.utils import (
     generate_unique_id,
     is_body_allowed_for_status_code,
 )
-from starlette.routing import BaseRoute
-from starlette.routing import Mount as Mount  # noqa
-from starlette.routing import compile_path, get_name, request_response
-from starlette.types import ASGIApp, Lifespan
 
 
 class DeferringAPIRoute(routing.APIRoute):
@@ -120,6 +121,10 @@ class DeferringAPIRoute(routing.APIRoute):
         if isinstance(status_code, IntEnum):
             status_code = int(status_code)
         self.status_code = status_code
+        if self.response_model:
+            assert is_body_allowed_for_status_code(
+                status_code
+            ), f"Status code {status_code} must not have a response body"
         self.dependencies = list(dependencies or [])
         self.description = description or inspect.cleandoc(self.endpoint.__doc__ or "")
         self.description = self.description.split("\f")[0].strip()
@@ -149,7 +154,7 @@ class DeferringAPIRoute(routing.APIRoute):
     def response_field(self):
         if self.response_model:
             response_name = "Response_" + self.unique_id
-            return create_model_field(  # type: ignore
+            return create_model_field(
                 name=response_name,
                 type_=self.response_model,
                 mode="serialization",
@@ -158,11 +163,11 @@ class DeferringAPIRoute(routing.APIRoute):
             return None
 
     @cached_property
-    def secure_cloned_response_field(self) -> Optional[ModelField]:  # type: ignore
+    def secure_cloned_response_field(self) -> Optional[ModelField]:
         return create_cloned_field(self.response_field) if self.response_model else None
 
     @cached_property
-    def response_fields(self):
+    def response_fields(self) -> Dict[Union[int, str], ModelField]:
         response_fields: Dict[Union[int, str], ModelField] = {}
         for additional_status_code, response in self.responses.items():
             assert isinstance(response, dict), "An additional response must be a dict"
