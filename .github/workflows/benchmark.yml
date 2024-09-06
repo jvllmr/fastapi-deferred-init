@@ -21,6 +21,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Setup PDM
         uses: pdm-project/setup-pdm@v4
         with:
