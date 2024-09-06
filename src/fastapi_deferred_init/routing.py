@@ -5,14 +5,10 @@ from typing import (
     Any,
     Callable,
     ClassVar,
-    Dict,
-    List,
     Optional,
-    Sequence,
-    Set,
-    Type,
     Union,
 )
+from collections.abc import Sequence
 
 from starlette.routing import BaseRoute
 from starlette.routing import Mount as Mount  # noqa
@@ -51,15 +47,15 @@ class DeferringAPIRoute(routing.APIRoute):
         *,
         response_model: Any = Default(None),
         status_code: Optional[int] = None,
-        tags: Optional[List[Union[str, Enum]]] = None,
+        tags: Optional[list[Union[str, Enum]]] = None,
         dependencies: Optional[Sequence[params.Depends]] = None,
         summary: Optional[str] = None,
         description: Optional[str] = None,
         response_description: str = "Successful Response",
-        responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
+        responses: Optional[dict[Union[int, str], dict[str, Any]]] = None,
         deprecated: Optional[bool] = None,
         name: Optional[str] = None,
-        methods: Optional[Union[Set[str], List[str]]] = None,
+        methods: Optional[Union[set[str], list[str]]] = None,
         operation_id: Optional[str] = None,
         response_model_include: Optional[IncEx] = None,
         response_model_exclude: Optional[IncEx] = None,
@@ -68,12 +64,12 @@ class DeferringAPIRoute(routing.APIRoute):
         response_model_exclude_defaults: bool = False,
         response_model_exclude_none: bool = False,
         include_in_schema: bool = True,
-        response_class: Union[Type[Response], DefaultPlaceholder] = Default(
+        response_class: Union[type[Response], DefaultPlaceholder] = Default(
             JSONResponse
         ),
         dependency_overrides_provider: Optional[Any] = None,
-        callbacks: Optional[List[BaseRoute]] = None,
-        openapi_extra: Optional[Dict[str, Any]] = None,
+        callbacks: Optional[list[BaseRoute]] = None,
+        openapi_extra: Optional[dict[str, Any]] = None,
         generate_unique_id_function: Union[
             Callable[["APIRoute"], str], DefaultPlaceholder
         ] = Default(generate_unique_id),
@@ -109,7 +105,7 @@ class DeferringAPIRoute(routing.APIRoute):
         self.path_regex, self.path_format, self.param_convertors = compile_path(path)
         if methods is None:
             methods = ["GET"]
-        self.methods: Set[str] = {method.upper() for method in methods}
+        self.methods: set[str] = {method.upper() for method in methods}
         if isinstance(generate_unique_id_function, DefaultPlaceholder):
             current_generate_unique_id: Callable[[APIRoute], str] = (
                 generate_unique_id_function.value
@@ -167,8 +163,8 @@ class DeferringAPIRoute(routing.APIRoute):
         return create_cloned_field(self.response_field) if self.response_model else None
 
     @cached_property
-    def response_fields(self) -> Dict[Union[int, str], ModelField]:
-        response_fields: Dict[Union[int, str], ModelField] = {}
+    def response_fields(self) -> dict[Union[int, str], ModelField]:
+        response_fields: dict[Union[int, str], ModelField] = {}
         for additional_status_code, response in self.responses.items():
             assert isinstance(response, dict), "An additional response must be a dict"
             model = response.get("model")
