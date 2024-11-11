@@ -33,7 +33,7 @@ post_install = {composite = ["pre-commit install", "pdm install --plugins --froz
 dev = [
     "pytest>=8.3.3",
     "black>=24.10.0",
-    "ruff>=0.7.2",
+    "ruff>=0.7.3",
     "pre-commit>=4.0.1",
     "mypy>=1.13.0",
     "tuna>=0.5.11",
