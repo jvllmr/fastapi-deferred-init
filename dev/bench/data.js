@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1738559562122,
+  "lastUpdate": 1739162073894,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -1361,6 +1361,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 2.0379583071543927",
             "extra": "mean: 21.7653708976 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d2a0c89732bd3bc2cd17c3c728f936fcd6db5c6c",
+          "message": "chore(deps): update all non-major dependencies (#38)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2025-02-10T04:30:50Z",
+          "tree_id": "f641991c718c513d9289e7df4bce7112f6e2ec34",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/d2a0c89732bd3bc2cd17c3c728f936fcd6db5c6c"
+        },
+        "date": 1739162073577,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 3.580197649265011,
+            "unit": "iter/sec",
+            "range": "stddev: 0.019760186475037064",
+            "extra": "mean: 279.3141881999986 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.04579486085942022,
+            "unit": "iter/sec",
+            "range": "stddev: 1.9010547533297424",
+            "extra": "mean: 21.836511373399997 sec\nrounds: 5"
           }
         ]
       }
