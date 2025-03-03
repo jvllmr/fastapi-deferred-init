@@ -3,7 +3,7 @@ name = "fastapi-deferred-init"
 description = "Faster FastAPI start-up time for Projects with many nested routers"
 keywords = ["fastapi", "speed", "router"]
 authors = [{ name = "Jan Vollmer", email = "jan@vllmr.dev" }]
-dependencies = ["fastapi>=0.115.8"]
+dependencies = ["fastapi>=0.115.11"]
 requires-python = ">=3.9"
 readme = "README.md"
 license = { text = "MIT" }
@@ -31,9 +31,9 @@ post_install = {composite = ["pre-commit install", "pdm install --plugins --froz
 
 [tool.pdm.dev-dependencies]
 dev = [
-    "pytest>=8.3.4",
+    "pytest>=8.3.5",
     "black>=25.1.0",
-    "ruff>=0.9.7",
+    "ruff>=0.9.9",
     "pre-commit>=4.1.0",
     "mypy>=1.15.0",
     "tuna>=0.5.11",
