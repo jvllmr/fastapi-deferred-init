@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1741588301593,
+  "lastUpdate": 1742195615069,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -1589,6 +1589,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 1.4169041021692217",
             "extra": "mean: 20.885814909600004 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "31ebaed8bc1234fde3db195f21cd2a09d934db4a",
+          "message": "chore(deps): update dependency ruff to >=0.11.0 (#44)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2025-03-17T07:09:49Z",
+          "tree_id": "5af13b6b96e9f446d8938e3fe6c2c42724f3edf8",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/31ebaed8bc1234fde3db195f21cd2a09d934db4a"
+        },
+        "date": 1742195614636,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 3.467038840250134,
+            "unit": "iter/sec",
+            "range": "stddev: 0.026922294521006463",
+            "extra": "mean: 288.4305731999973 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.04668926346619519,
+            "unit": "iter/sec",
+            "range": "stddev: 1.6397744473909657",
+            "extra": "mean: 21.418200368999997 sec\nrounds: 5"
           }
         ]
       }
