@@ -48,7 +48,7 @@ def gen_func_def(n=1, last=False):
             defaults=[
                 ast.Call(
                     func=ast.Name(id="Depends", ctx=ast.Load()),
-                    args=[ast.Name(id=f"dependency{n-1}", ctx=ast.Load())],
+                    args=[ast.Name(id=f"dependency{n - 1}", ctx=ast.Load())],
                     keywords=[],
                 )
             ],
@@ -141,7 +141,7 @@ def gen_router(n=2, last=False, use_lib=True):
                         attr="include_router",
                         ctx=ast.Load(),
                     ),
-                    args=[ast.Name(id=f"router{n-1}", ctx=ast.Load())],
+                    args=[ast.Name(id=f"router{n - 1}", ctx=ast.Load())],
                     keywords=[],
                 )
             ),
