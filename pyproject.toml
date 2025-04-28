@@ -33,13 +33,13 @@ post_install = {composite = ["pre-commit install", "pdm install --plugins --froz
 dev = [
     "pytest>=8.3.5",
     "black>=25.1.0",
-    "ruff>=0.11.6",
+    "ruff>=0.11.7",
     "pre-commit>=4.2.0",
     "mypy>=1.15.0",
     "tuna>=0.5.11",
     "httpx>=0.28.1",
     "pytest-benchmark>=5.1.0",
-    "pip>=25.0.1",
+    "pip>=25.1",
 ]
 
 [tool.isort]
