@@ -118,9 +118,9 @@ class DeferringAPIRoute(routing.APIRoute):
             status_code = int(status_code)
         self.status_code = status_code
         if self.response_model:
-            assert is_body_allowed_for_status_code(
-                status_code
-            ), f"Status code {status_code} must not have a response body"
+            assert is_body_allowed_for_status_code(status_code), (
+                f"Status code {status_code} must not have a response body"
+            )
         self.dependencies = list(dependencies or [])
         self.description = description or inspect.cleandoc(self.endpoint.__doc__ or "")
         self.description = self.description.split("\f")[0].strip()
@@ -169,9 +169,9 @@ class DeferringAPIRoute(routing.APIRoute):
             assert isinstance(response, dict), "An additional response must be a dict"
             model = response.get("model")
             if model:
-                assert is_body_allowed_for_status_code(
-                    additional_status_code
-                ), f"Status code {additional_status_code} must not have a response body"
+                assert is_body_allowed_for_status_code(additional_status_code), (
+                    f"Status code {additional_status_code} must not have a response body"
+                )
                 response_name = f"Response_{additional_status_code}_{self.unique_id}"
                 response_field = create_model_field(
                     name=response_name, type_=model, mode="serialization"
