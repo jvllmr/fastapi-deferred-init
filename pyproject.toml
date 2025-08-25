@@ -4,7 +4,7 @@ description = "Faster FastAPI start-up time for Projects with many nested router
 keywords = ["fastapi", "speed", "router"]
 authors = [{ name = "Jan Vollmer", email = "jan@vllmr.dev" }]
 dependencies = ["fastapi>=0.116.1"]
-requires-python = ">=3.9"
+requires-python = ">=3.13.7"
 readme = "README.md"
 license = { text = "MIT" }
 classifiers = ["Framework :: FastAPI"]
@@ -31,15 +31,15 @@ post_install = {composite = ["pre-commit install", "pdm install --plugins --froz
 
 [tool.pdm.dev-dependencies]
 dev = [
-    "pytest>=8.3.5",
+    "pytest>=8.4.1",
     "black>=25.1.0",
-    "ruff>=0.11.7",
-    "pre-commit>=4.2.0",
-    "mypy>=1.15.0",
+    "ruff>=0.12.10",
+    "pre-commit>=4.3.0",
+    "mypy>=1.17.1",
     "tuna>=0.5.11",
     "httpx>=0.28.1",
     "pytest-benchmark>=5.1.0",
-    "pip>=25.1",
+    "pip>=25.2",
 ]
 
 [tool.isort]
