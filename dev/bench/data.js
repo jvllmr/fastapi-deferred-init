@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758520661611,
+  "lastUpdate": 1759866908279,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -2235,6 +2235,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 1.8058888216974702",
             "extra": "mean: 21.84955781460002 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5140e4d4029f44ddc6205f42d60e5d5ec7b4b492",
+          "message": "fix: compatibility with fastapi 0.118.0 (#60)\n\n* fix: compatibility with fastapi 0.118.0\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>\n\n* [pre-commit.ci] auto fixes from pre-commit.com hooks\n\nfor more information, see https://pre-commit.ci\n\n---------\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>\nCo-authored-by: pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>",
+          "timestamp": "2025-10-07T21:51:20+02:00",
+          "tree_id": "c563c166f4971b03c765f34ebc125fe8d4e84a9e",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/5140e4d4029f44ddc6205f42d60e5d5ec7b4b492"
+        },
+        "date": 1759866907694,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 3.2316189603150764,
+            "unit": "iter/sec",
+            "range": "stddev: 0.015375375291670781",
+            "extra": "mean: 309.44242260000294 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.04528420675612739,
+            "unit": "iter/sec",
+            "range": "stddev: 1.4977981753137166",
+            "extra": "mean: 22.082754046799998 sec\nrounds: 5"
           }
         ]
       }
