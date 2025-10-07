@@ -12,8 +12,9 @@ from collections.abc import Sequence
 
 from starlette.routing import BaseRoute
 from starlette.routing import Mount as Mount  # noqa
-from starlette.routing import compile_path, get_name, request_response
+from starlette.routing import compile_path, get_name
 from starlette.types import ASGIApp, Lifespan
+
 
 from fastapi import params, routing  # type:ignore
 from fastapi._compat import ModelField, lenient_issubclass
@@ -27,7 +28,6 @@ from fastapi.dependencies.utils import (
     get_typed_return_annotation,
 )
 from fastapi.responses import JSONResponse, Response
-from fastapi.routing import APIRoute
 from fastapi.types import IncEx
 from fastapi.utils import (
     create_cloned_field,
@@ -71,7 +71,7 @@ class DeferringAPIRoute(routing.APIRoute):
         callbacks: Optional[list[BaseRoute]] = None,
         openapi_extra: Optional[dict[str, Any]] = None,
         generate_unique_id_function: Union[
-            Callable[["APIRoute"], str], DefaultPlaceholder
+            Callable[["routing.APIRoute"], str], DefaultPlaceholder
         ] = Default(generate_unique_id),
     ) -> None:
         self.path = path
@@ -107,7 +107,7 @@ class DeferringAPIRoute(routing.APIRoute):
             methods = ["GET"]
         self.methods: set[str] = {method.upper() for method in methods}
         if isinstance(generate_unique_id_function, DefaultPlaceholder):
-            current_generate_unique_id: Callable[[APIRoute], str] = (
+            current_generate_unique_id: Callable[[routing.APIRoute], str] = (
                 generate_unique_id_function.value
             )
         else:
@@ -118,9 +118,9 @@ class DeferringAPIRoute(routing.APIRoute):
             status_code = int(status_code)
         self.status_code = status_code
         if self.response_model:
-            assert is_body_allowed_for_status_code(
-                status_code
-            ), f"Status code {status_code} must not have a response body"
+            assert is_body_allowed_for_status_code(status_code), (
+                f"Status code {status_code} must not have a response body"
+            )
         self.dependencies = list(dependencies or [])
         self.description = description or inspect.cleandoc(self.endpoint.__doc__ or "")
         self.description = self.description.split("\f")[0].strip()
@@ -169,9 +169,9 @@ class DeferringAPIRoute(routing.APIRoute):
             assert isinstance(response, dict), "An additional response must be a dict"
             model = response.get("model")
             if model:
-                assert is_body_allowed_for_status_code(
-                    additional_status_code
-                ), f"Status code {additional_status_code} must not have a response body"
+                assert is_body_allowed_for_status_code(additional_status_code), (
+                    f"Status code {additional_status_code} must not have a response body"
+                )
                 response_name = f"Response_{additional_status_code}_{self.unique_id}"
                 response_field = create_model_field(
                     name=response_name, type_=model, mode="serialization"
@@ -189,7 +189,7 @@ class DeferringAPIRoute(routing.APIRoute):
 
     @cached_property
     def app(self):
-        return request_response(self.get_route_handler())
+        return routing.request_response(self.get_route_handler())
 
 
 class DeferringAPIRouter(routing.APIRouter):
@@ -206,13 +206,13 @@ class DeferringAPIRouter(routing.APIRouter):
         redirect_slashes: bool = True,
         default: Optional[ASGIApp] = None,
         dependency_overrides_provider: Optional[Any] = None,
-        route_class: type[APIRoute] = DeferringAPIRoute,
+        route_class: type[routing.APIRoute] = DeferringAPIRoute,
         on_startup: Optional[Sequence[Callable[[], Any]]] = None,
         on_shutdown: Optional[Sequence[Callable[[], Any]]] = None,
         lifespan: Optional[Lifespan[Any]] = None,
         deprecated: Optional[bool] = None,
         include_in_schema: bool = True,
-        generate_unique_id_function: Callable[[APIRoute], str] = Default(
+        generate_unique_id_function: Callable[[routing.APIRoute], str] = Default(
             generate_unique_id
         ),
     ) -> None:
