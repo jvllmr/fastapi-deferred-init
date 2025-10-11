@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1760213784810,
+  "lastUpdate": 1760213957869,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -2387,6 +2387,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 1.9645889201218052",
             "extra": "mean: 23.189086058400015 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c3fba4477b09422bd94f910c8a9bdb7969ead1dd",
+          "message": "chore(ci): test with python 3.14 (#62)\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>",
+          "timestamp": "2025-10-11T22:15:26+02:00",
+          "tree_id": "05b101a8fed821605a69f13867a2cafa93bc8a94",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/c3fba4477b09422bd94f910c8a9bdb7969ead1dd"
+        },
+        "date": 1760213956911,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 3.4900948695944973,
+            "unit": "iter/sec",
+            "range": "stddev: 0.011513012321127383",
+            "extra": "mean: 286.5251626000031 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.04522507581146231,
+            "unit": "iter/sec",
+            "range": "stddev: 1.4763490805215165",
+            "extra": "mean: 22.11162683660001 sec\nrounds: 5"
           }
         ]
       }
