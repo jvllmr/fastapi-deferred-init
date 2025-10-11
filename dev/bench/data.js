@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1759909265706,
+  "lastUpdate": 1760213784810,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -2349,6 +2349,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 1.5444119683458486",
             "extra": "mean: 21.582876442600007 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "dfbe6fe7c3ec55cc0235b79b643308008a8fa69b",
+          "message": "chore(deps): update fastapi to 0.119.0 (#61)\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>",
+          "timestamp": "2025-10-11T22:12:27+02:00",
+          "tree_id": "8ed71abd86aad3e609b3652cd49671b6c4d65d61",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/dfbe6fe7c3ec55cc0235b79b643308008a8fa69b"
+        },
+        "date": 1760213784471,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 3.3889214090534234,
+            "unit": "iter/sec",
+            "range": "stddev: 0.02041361949594045",
+            "extra": "mean: 295.07913560005363 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.04312373491053391,
+            "unit": "iter/sec",
+            "range": "stddev: 1.9645889201218052",
+            "extra": "mean: 23.189086058400015 sec\nrounds: 5"
           }
         ]
       }
