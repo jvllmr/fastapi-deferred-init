@@ -3,7 +3,7 @@ name = "fastapi-deferred-init"
 description = "Faster FastAPI start-up time for Projects with many nested routers"
 keywords = ["fastapi", "speed", "router"]
 authors = [{ name = "Jan Vollmer", email = "jan@vllmr.dev" }]
-dependencies = ["fastapi>=0.118.0"]
+dependencies = ["fastapi>=0.119.0"]
 requires-python = ">=3.9"
 readme = "README.md"
 license = { text = "MIT" }
