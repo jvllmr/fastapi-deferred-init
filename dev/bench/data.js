@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1762150698108,
+  "lastUpdate": 1762195996908,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -2615,6 +2615,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 1.408969102542964",
             "extra": "mean: 21.744465078400008 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "77bf7c08719d24ddb361a9e4d71f7b9db042dcc4",
+          "message": "chore: update fastapi to 0.121.0 (#68)\n\n* chore: update fastapi to 0.121.0\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>\n\n* enable renovate pre-commit manager\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>\n\n* adapt upstream changes\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>\n\n---------\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>",
+          "timestamp": "2025-11-03T19:48:29+01:00",
+          "tree_id": "595b829a761e2b1fbbf6722e0efc08409660c0d3",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/77bf7c08719d24ddb361a9e4d71f7b9db042dcc4"
+        },
+        "date": 1762195996004,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 3.5570484206374666,
+            "unit": "iter/sec",
+            "range": "stddev: 0.012383664515689247",
+            "extra": "mean: 281.131961600002 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.034052851935943006,
+            "unit": "iter/sec",
+            "range": "stddev: 2.105428596042738",
+            "extra": "mean: 29.366115997599998 sec\nrounds: 5"
           }
         ]
       }
