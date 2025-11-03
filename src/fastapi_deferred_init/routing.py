@@ -129,7 +129,9 @@ class DeferringAPIRoute(routing.APIRoute):
 
     @cached_property
     def dependant(self):
-        dependant = get_dependant(path=self.path_format, call=self.endpoint)
+        dependant = get_dependant(
+            path=self.path_format, call=self.endpoint, scope="function"
+        )
 
         for depends in self.dependencies[::-1]:
             dependant.dependencies.insert(
