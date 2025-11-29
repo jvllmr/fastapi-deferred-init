@@ -18,6 +18,12 @@
       "description": "Do not update requires-python",
       "matchDepTypes": ["requires-python"],
       "enabled": false
+    },
+    {
+      "description": "Don't update dependencies that dropped python 3.9 too soon...",
+      "matchManagers": ["pep621"],
+      "matchPackageNames": ["platformdirs", "click", "pre-commit", "cfgv"],
+      "enabled": false
     }
   ]
 }
