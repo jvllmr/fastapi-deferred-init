@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1762195996908,
+  "lastUpdate": 1764422898270,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -2653,6 +2653,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 2.105428596042738",
             "extra": "mean: 29.366115997599998 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "committer": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "distinct": true,
+          "id": "7211ca0c6e5972bb1b35ea9eed32a93b6f52e85a",
+          "message": "fix(renovate): don't update dependencies that dropped python 3.9\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>",
+          "timestamp": "2025-11-29T14:23:14+01:00",
+          "tree_id": "f77b699c228bce81e3aa4cdff36c82e4f8a52e6c",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/7211ca0c6e5972bb1b35ea9eed32a93b6f52e85a"
+        },
+        "date": 1764422898019,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 3.5603595204900826,
+            "unit": "iter/sec",
+            "range": "stddev: 0.01116326337215195",
+            "extra": "mean: 280.87051160000556 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.03457653344580401,
+            "unit": "iter/sec",
+            "range": "stddev: 1.7734520706223955",
+            "extra": "mean: 28.921349260400007 sec\nrounds: 5"
           }
         ]
       }
