@@ -3,7 +3,7 @@ name = "fastapi-deferred-init"
 description = "Faster FastAPI start-up time for Projects with many nested routers"
 keywords = ["fastapi", "speed", "router"]
 authors = [{ name = "Jan Vollmer", email = "jan@vllmr.dev" }]
-dependencies = ["fastapi>=0.123.0"]
+dependencies = ["fastapi>=0.128.5"]
 requires-python = ">=3.9"
 readme = "README.md"
 license = { text = "MIT" }
@@ -26,21 +26,8 @@ plugins = ["sync-pre-commit-lock"]
 test = "pytest tests"
 full_test = {shell= "pytest tests", env= {FULL_TEST = "true"}}
 benchmark = {shell= "pytest tests --benchmark-json benchmark.json", env= {FULL_TEST = "true"}}
-post_install = {composite = ["pre-commit install", "pdm install --plugins --frozen-lock", "pip install -r fastapi/requirements.txt"]}
+post_install = {composite = ["pre-commit install", "pdm install --plugins --frozen-lock", "pip install ./fastapi"]}
 
-
-[tool.pdm.dev-dependencies]
-dev = [
-    "pytest>=8.4.2",
-    "black>=25.11.0",
-    "ruff>=0.14.7",
-    "pre-commit>=4.3.0",
-    "mypy>=1.19.0",
-    "tuna>=0.5.11",
-    "httpx>=0.28.1",
-    "pytest-benchmark>=5.2.3",
-    "pip>=25.3",
-]
 
 [tool.isort]
 profile = "black"
@@ -50,3 +37,16 @@ source = "scm"
 
 [tool.pycln]
 all = true
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "ruff>=0.14.7",
+    "pre-commit>=4.3.0",
+    "mypy>=1.19.0",
+    "tuna>=0.5.11",
+    "httpx>=0.28.1",
+    "pytest-benchmark>=5.2.3",
+    "pip>=25.3",
+    "inline-snapshot>=0.31.1",
+]
