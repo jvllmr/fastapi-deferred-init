@@ -30,7 +30,6 @@ from fastapi.dependencies.utils import (
 from fastapi.responses import JSONResponse, Response
 from fastapi.types import IncEx
 from fastapi.utils import (
-    create_cloned_field,
     create_model_field,
     generate_unique_id,
     is_body_allowed_for_status_code,
@@ -159,10 +158,6 @@ class DeferringAPIRoute(routing.APIRoute):
             )
         else:
             return None
-
-    @cached_property
-    def secure_cloned_response_field(self) -> Optional[ModelField]:
-        return create_cloned_field(self.response_field) if self.response_model else None
 
     @cached_property
     def response_fields(self) -> dict[Union[int, str], ModelField]:
