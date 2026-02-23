@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770642934960,
+  "lastUpdate": 1771882528986,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -3031,6 +3031,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 3.299429827726016",
             "extra": "mean: 51.04631012779999 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f2ae405f883a44fa7b7c970a256d26b7e135203b",
+          "message": "fix: compatibility with fastapi 0.132.0 and drop python 3.9 (#78)\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>",
+          "timestamp": "2026-02-23T22:27:58+01:00",
+          "tree_id": "dfd4b184eb06e450e084de7eefec10b66505b774",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/f2ae405f883a44fa7b7c970a256d26b7e135203b"
+        },
+        "date": 1771882528194,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 3.554363811806763,
+            "unit": "iter/sec",
+            "range": "stddev: 0.01096762875527341",
+            "extra": "mean: 281.3443004000419 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.01987097748107743,
+            "unit": "iter/sec",
+            "range": "stddev: 3.200501833433304",
+            "extra": "mean: 50.3246506596 sec\nrounds: 5"
           }
         ]
       }
