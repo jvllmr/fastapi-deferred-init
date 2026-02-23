@@ -72,6 +72,7 @@ class DeferringAPIRoute(routing.APIRoute):
         generate_unique_id_function: Union[
             Callable[["routing.APIRoute"], str], DefaultPlaceholder
         ] = Default(generate_unique_id),
+        strict_content_type: bool = Default(True),
     ) -> None:
         self.path = path
         self.endpoint = endpoint
@@ -98,6 +99,7 @@ class DeferringAPIRoute(routing.APIRoute):
         self.callbacks = callbacks
         self.openapi_extra = openapi_extra
         self.generate_unique_id_function = generate_unique_id_function
+        self.strict_content_type = strict_content_type
         self.tags = tags or []
         self.responses = responses or {}
         self.name = get_name(endpoint) if name is None else name
@@ -212,6 +214,7 @@ class DeferringAPIRouter(routing.APIRouter):
         generate_unique_id_function: Callable[[routing.APIRoute], str] = Default(
             generate_unique_id
         ),
+        strict_content_type: bool = Default(True),
     ) -> None:
         super().__init__(
             prefix=prefix,
@@ -231,4 +234,5 @@ class DeferringAPIRouter(routing.APIRouter):
             deprecated=deprecated,
             include_in_schema=include_in_schema,
             generate_unique_id_function=generate_unique_id_function,
+            strict_content_type=strict_content_type,
         )
