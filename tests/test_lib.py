@@ -89,3 +89,20 @@ def test_fastapi_openapi_schema(monkeypatch):
 
     fastapi_test_openapi_schema()
     fastapi_test_openapi_schema_additional()
+
+
+def test_fastapi_sse(monkeypatch):
+    monkeypatch.setattr("fastapi.routing.APIRoute", DeferringAPIRoute)
+    monkeypatch.setattr("fastapi.routing.APIRouter", DeferringAPIRouter)
+    import_via_file_path(
+        "fastapi_clone.tests.test_sse",
+        "fastapi/tests/test_sse.py",
+    )
+
+    from fastapi_clone.tests.test_sse import (  # type: ignore
+        test_raw_data_sent_without_json_encoding as fastapi_test_raw_data_sent_without_json_encoding,
+        client_fixture as fastapi_client_fixture,
+    )
+
+    for client in fastapi_client_fixture.__wrapped__():
+        fastapi_test_raw_data_sent_without_json_encoding(client)

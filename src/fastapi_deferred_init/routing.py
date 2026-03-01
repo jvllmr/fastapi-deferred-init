@@ -15,7 +15,10 @@ from starlette.routing import Mount as Mount  # noqa
 from starlette.routing import compile_path, get_name
 from starlette.types import ASGIApp, Lifespan
 
-
+from fastapi.sse import (
+    EventSourceResponse,
+    ServerSentEvent,
+)
 from fastapi import params, routing  # type:ignore
 from fastapi._compat import ModelField, lenient_issubclass
 from fastapi.datastructures import Default, DefaultPlaceholder
@@ -26,6 +29,7 @@ from fastapi.dependencies.utils import (
     get_flat_dependant,
     get_parameterless_sub_dependant,
     get_typed_return_annotation,
+    get_stream_item_type,
 )
 from fastapi.responses import JSONResponse, Response
 from fastapi.types import IncEx
@@ -45,43 +49,56 @@ class DeferringAPIRoute(routing.APIRoute):
         endpoint: Callable[..., Any],
         *,
         response_model: Any = Default(None),
-        status_code: Optional[int] = None,
-        tags: Optional[list[Union[str, Enum]]] = None,
-        dependencies: Optional[Sequence[params.Depends]] = None,
-        summary: Optional[str] = None,
-        description: Optional[str] = None,
+        status_code: int | None = None,
+        tags: list[str | Enum] | None = None,
+        dependencies: Sequence[params.Depends] | None = None,
+        summary: str | None = None,
+        description: str | None = None,
         response_description: str = "Successful Response",
-        responses: Optional[dict[Union[int, str], dict[str, Any]]] = None,
-        deprecated: Optional[bool] = None,
-        name: Optional[str] = None,
-        methods: Optional[Union[set[str], list[str]]] = None,
-        operation_id: Optional[str] = None,
-        response_model_include: Optional[IncEx] = None,
-        response_model_exclude: Optional[IncEx] = None,
+        responses: dict[int | str, dict[str, Any]] | None = None,
+        deprecated: bool | None = None,
+        name: str | None = None,
+        methods: set[str] | list[str] | None = None,
+        operation_id: str | None = None,
+        response_model_include: IncEx | None = None,
+        response_model_exclude: IncEx | None = None,
         response_model_by_alias: bool = True,
         response_model_exclude_unset: bool = False,
         response_model_exclude_defaults: bool = False,
         response_model_exclude_none: bool = False,
         include_in_schema: bool = True,
-        response_class: Union[type[Response], DefaultPlaceholder] = Default(
-            JSONResponse
-        ),
-        dependency_overrides_provider: Optional[Any] = None,
-        callbacks: Optional[list[BaseRoute]] = None,
-        openapi_extra: Optional[dict[str, Any]] = None,
-        generate_unique_id_function: Union[
-            Callable[["routing.APIRoute"], str], DefaultPlaceholder
-        ] = Default(generate_unique_id),
-        strict_content_type: bool = Default(True),
+        response_class: type[Response] | DefaultPlaceholder = Default(JSONResponse),
+        dependency_overrides_provider: Any | None = None,
+        callbacks: list[BaseRoute] | None = None,
+        openapi_extra: dict[str, Any] | None = None,
+        generate_unique_id_function: Callable[[routing.APIRoute], str]
+        | DefaultPlaceholder = Default(generate_unique_id),
+        strict_content_type: bool | DefaultPlaceholder = Default(True),
     ) -> None:
         self.path = path
         self.endpoint = endpoint
+        self.stream_item_type: Any | None = None
         if isinstance(response_model, DefaultPlaceholder):
             return_annotation = get_typed_return_annotation(endpoint)
             if lenient_issubclass(return_annotation, Response):
                 response_model = None
             else:
-                response_model = return_annotation
+                stream_item = get_stream_item_type(return_annotation)
+                if stream_item is not None:
+                    # Extract item type for JSONL or SSE streaming when
+                    # response_class is DefaultPlaceholder (JSONL) or
+                    # EventSourceResponse (SSE).
+                    # ServerSentEvent is excluded: it's a transport
+                    # wrapper, not a data model, so it shouldn't feed
+                    # into validation or OpenAPI schema generation.
+                    if (
+                        isinstance(response_class, DefaultPlaceholder)
+                        or lenient_issubclass(response_class, EventSourceResponse)
+                    ) and not lenient_issubclass(stream_item, ServerSentEvent):
+                        self.stream_item_type = stream_item
+                    response_model = None
+                else:
+                    response_model = return_annotation
         self.response_model = response_model
         self.summary = summary
         self.response_description = response_description
@@ -122,8 +139,11 @@ class DeferringAPIRoute(routing.APIRoute):
             assert is_body_allowed_for_status_code(status_code), (
                 f"Status code {status_code} must not have a response body"
             )
+
         self.dependencies = list(dependencies or [])
         self.description = description or inspect.cleandoc(self.endpoint.__doc__ or "")
+        # if a "form feed" character (page break) is found in the description text,
+        # truncate description text to the content preceding the first "form feed"
         self.description = self.description.split("\f")[0].strip()
 
         assert callable(endpoint), "An endpoint must be a callable"
@@ -140,6 +160,20 @@ class DeferringAPIRoute(routing.APIRoute):
                 get_parameterless_sub_dependant(depends=depends, path=self.path_format),
             )
         return dependant
+
+    @property
+    def is_generator(self) -> bool:
+        return self.dependant.is_async_gen_callable or self.dependant.is_gen_callable
+
+    @property
+    def is_sse_stream(self) -> bool:
+        return self.is_generator and lenient_issubclass(
+            self.response_class, EventSourceResponse
+        )
+
+    @property
+    def is_json_stream(self) -> bool:
+        return self.is_generator and isinstance(self.response_class, DefaultPlaceholder)
 
     @cached_property
     def _flat_dependant(self):
@@ -160,6 +194,17 @@ class DeferringAPIRoute(routing.APIRoute):
             )
         else:
             return None
+
+    @cached_property
+    def stream_item_field(self) -> ModelField | None:
+        if not self.stream_item_type:
+            return None
+        stream_item_name = "StreamItem_" + self.unique_id
+        return create_model_field(
+            name=stream_item_name,
+            type_=self.stream_item_type,
+            mode="serialization",
+        )
 
     @cached_property
     def response_fields(self) -> dict[Union[int, str], ModelField]:
