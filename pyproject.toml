@@ -40,13 +40,13 @@ all = true
 
 [dependency-groups]
 dev = [
-    "pytest>=9.0.2",
-    "ruff>=0.15.9",
+    "pytest>=9.0.3",
+    "ruff>=0.15.10",
     "pre-commit>=4.3.0",
-    "mypy>=1.20.0",
-    "tuna>=0.5.11",
+    "mypy>=1.20.1",
+    "tuna>=0.5.13",
     "httpx>=0.28.1",
     "pytest-benchmark>=5.2.3",
     "pip>=26.0.1",
-    "inline-snapshot>=0.32.5",
+    "inline-snapshot>=0.32.6",
 ]
