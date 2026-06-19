@@ -1,61 +1,95 @@
-import inspect
-from enum import Enum, IntEnum
+from enum import Enum
 from functools import cached_property
 from typing import (
     Any,
     Callable,
-    ClassVar,
     Optional,
     Union,
 )
 from collections.abc import Sequence
 
-from starlette.routing import BaseRoute
-from starlette.routing import Mount as Mount  # noqa
-from starlette.routing import compile_path, get_name
+from starlette.routing import BaseRoute, compile_path
+
 from starlette.types import ASGIApp, Lifespan
 
-from fastapi.sse import (
-    EventSourceResponse,
-    ServerSentEvent,
-)
-from fastapi import params, routing  # type:ignore
-from fastapi._compat import ModelField, lenient_issubclass
+from fastapi import params, routing  # type: ignore[attr-defined]
 from fastapi.datastructures import Default, DefaultPlaceholder
-from fastapi.dependencies.utils import (
-    _should_embed_body_fields,
-    get_body_field,
-    get_dependant,
-    get_flat_dependant,
-    get_parameterless_sub_dependant,
-    get_typed_return_annotation,
-    get_stream_item_type,
-)
 from fastapi.responses import JSONResponse, Response
 from fastapi.types import IncEx
 from fastapi.utils import (
-    create_model_field,
     generate_unique_id,
-    is_body_allowed_for_status_code,
 )
 
 
+import typing as t
+
+
+def _getattr(route, name) -> t.Any:
+    return object.__getattribute__(route, name)
+
+
 class DeferringAPIRoute(routing.APIRoute):
-    _getattr: ClassVar[Callable[[Any, str], Any]]
+    def __prepopulate_route(self, route: routing._APIRouteLike, **kw: t.Any) -> None:
+        for k, v in kw.items():
+            setattr(route, k, v)
+            self.__prepopulated_fields.add(k)
+
+    def __getattribute__(self, name: str) -> t.Any:
+        if (
+            not name.startswith("_DeferringAPIRoute__")
+            and not name.startswith("__")
+            and not self.__populated
+            and name not in self.__prepopulated_fields
+        ):
+            raise ValueError("reee!")
+            print("populating...")
+            self.__populated = True
+            routing._populate_api_route_state(
+                t.cast(routing._APIRouteLike, self),
+                object.__getattribute__(self, "path"),
+                self.endpoint,
+                response_model=self.response_model,
+                status_code=self.status_code,
+                tags=self.tags,
+                dependencies=self.dependencies,
+                summary=self.summary,
+                description=self.description,
+                response_description=self.response_description,
+                responses=self.responses,
+                deprecated=self.deprecated,
+                name=self.name,
+                methods=self.methods,
+                operation_id=self.operation_id,
+                response_model_include=self.response_model_include,
+                response_model_exclude=self.response_model_exclude,
+                response_model_by_alias=self.response_model_by_alias,
+                response_model_exclude_unset=self.response_model_exclude_unset,
+                response_model_exclude_defaults=self.response_model_exclude_defaults,
+                response_model_exclude_none=self.response_model_exclude_none,
+                include_in_schema=self.include_in_schema,
+                response_class=self.response_class,
+                dependency_overrides_provider=self.dependency_overrides_provider,
+                callbacks=self.callbacks,
+                openapi_extra=self.openapi_extra,
+                generate_unique_id_function=self.generate_unique_id_function,
+                strict_content_type=self.strict_content_type,
+            )
+            print("populated!")
+        return object.__getattribute__(self, name)
 
     def __init__(
         self,
         path: str,
-        endpoint: Callable[..., Any],
+        endpoint: t.Callable[..., t.Any],
         *,
-        response_model: Any = Default(None),
+        response_model: t.Any = Default(None),
         status_code: int | None = None,
         tags: list[str | Enum] | None = None,
-        dependencies: Sequence[params.Depends] | None = None,
+        dependencies: t.Sequence[params.Depends] | None = None,
         summary: str | None = None,
         description: str | None = None,
         response_description: str = "Successful Response",
-        responses: dict[int | str, dict[str, Any]] | None = None,
+        responses: dict[int | str, dict[str, t.Any]] | None = None,
         deprecated: bool | None = None,
         name: str | None = None,
         methods: set[str] | list[str] | None = None,
@@ -68,168 +102,48 @@ class DeferringAPIRoute(routing.APIRoute):
         response_model_exclude_none: bool = False,
         include_in_schema: bool = True,
         response_class: type[Response] | DefaultPlaceholder = Default(JSONResponse),
-        dependency_overrides_provider: Any | None = None,
+        dependency_overrides_provider: t.Any | None = None,
         callbacks: list[BaseRoute] | None = None,
-        openapi_extra: dict[str, Any] | None = None,
-        generate_unique_id_function: Callable[[routing.APIRoute], str]
+        openapi_extra: dict[str, t.Any] | None = None,
+        generate_unique_id_function: t.Callable[["routing.APIRoute"], str]
         | DefaultPlaceholder = Default(generate_unique_id),
         strict_content_type: bool | DefaultPlaceholder = Default(True),
     ) -> None:
-        self.path = path
-        self.endpoint = endpoint
-        self.stream_item_type: Any | None = None
-        if isinstance(response_model, DefaultPlaceholder):
-            return_annotation = get_typed_return_annotation(endpoint)
-            if lenient_issubclass(return_annotation, Response):
-                response_model = None
-            else:
-                stream_item = get_stream_item_type(return_annotation)
-                if stream_item is not None:
-                    # Extract item type for JSONL or SSE streaming when
-                    # response_class is DefaultPlaceholder (JSONL) or
-                    # EventSourceResponse (SSE).
-                    # ServerSentEvent is excluded: it's a transport
-                    # wrapper, not a data model, so it shouldn't feed
-                    # into validation or OpenAPI schema generation.
-                    if (
-                        isinstance(response_class, DefaultPlaceholder)
-                        or lenient_issubclass(response_class, EventSourceResponse)
-                    ) and not lenient_issubclass(stream_item, ServerSentEvent):
-                        self.stream_item_type = stream_item
-                    response_model = None
-                else:
-                    response_model = return_annotation
-        self.response_model = response_model
-        self.summary = summary
-        self.response_description = response_description
-        self.deprecated = deprecated
-        self.operation_id = operation_id
-        self.response_model_include = response_model_include
-        self.response_model_exclude = response_model_exclude
-        self.response_model_by_alias = response_model_by_alias
-        self.response_model_exclude_unset = response_model_exclude_unset
-        self.response_model_exclude_defaults = response_model_exclude_defaults
-        self.response_model_exclude_none = response_model_exclude_none
-        self.include_in_schema = include_in_schema
-        self.response_class = response_class
-        self.dependency_overrides_provider = dependency_overrides_provider
-        self.callbacks = callbacks
-        self.openapi_extra = openapi_extra
-        self.generate_unique_id_function = generate_unique_id_function
-        self.strict_content_type = strict_content_type
-        self.tags = tags or []
-        self.responses = responses or {}
-        self.name = get_name(endpoint) if name is None else name
+        self.__populated = False
+        self.__prepopulated_fields: set[str] = {"app", "path_regex"}
+        for k in self.__dir__():
+            self.__prepopulated_fields.add(k)
+        self.__prepopulate_route(
+            t.cast(routing._APIRouteLike, self),
+            path=path,
+            endpoint=endpoint,
+            response_model=response_model,
+            status_code=status_code,
+            tags=tags,
+            dependencies=dependencies,
+            summary=summary,
+            description=description,
+            response_description=response_description,
+            responses=responses,
+            deprecated=deprecated,
+            name=name,
+            methods=methods,
+            operation_id=operation_id,
+            response_model_include=response_model_include,
+            response_model_exclude=response_model_exclude,
+            response_model_by_alias=response_model_by_alias,
+            response_model_exclude_unset=response_model_exclude_unset,
+            response_model_exclude_defaults=response_model_exclude_defaults,
+            response_model_exclude_none=response_model_exclude_none,
+            include_in_schema=include_in_schema,
+            response_class=response_class,
+            dependency_overrides_provider=dependency_overrides_provider,
+            callbacks=callbacks,
+            openapi_extra=openapi_extra,
+            generate_unique_id_function=generate_unique_id_function,
+            strict_content_type=strict_content_type,
+        )
         self.path_regex, self.path_format, self.param_convertors = compile_path(path)
-        if methods is None:
-            methods = ["GET"]
-        self.methods: set[str] = {method.upper() for method in methods}
-        if isinstance(generate_unique_id_function, DefaultPlaceholder):
-            current_generate_unique_id: Callable[[routing.APIRoute], str] = (
-                generate_unique_id_function.value
-            )
-        else:
-            current_generate_unique_id = generate_unique_id_function
-        self.unique_id = self.operation_id or current_generate_unique_id(self)
-        # normalize enums e.g. http.HTTPStatus
-        if isinstance(status_code, IntEnum):
-            status_code = int(status_code)
-        self.status_code = status_code
-        if self.response_model:
-            assert is_body_allowed_for_status_code(status_code), (
-                f"Status code {status_code} must not have a response body"
-            )
-
-        self.dependencies = list(dependencies or [])
-        self.description = description or inspect.cleandoc(self.endpoint.__doc__ or "")
-        # if a "form feed" character (page break) is found in the description text,
-        # truncate description text to the content preceding the first "form feed"
-        self.description = self.description.split("\f")[0].strip()
-
-        assert callable(endpoint), "An endpoint must be a callable"
-
-    @cached_property
-    def dependant(self):
-        dependant = get_dependant(
-            path=self.path_format, call=self.endpoint, scope="function"
-        )
-
-        for depends in self.dependencies[::-1]:
-            dependant.dependencies.insert(
-                0,
-                get_parameterless_sub_dependant(depends=depends, path=self.path_format),
-            )
-        return dependant
-
-    @property
-    def is_generator(self) -> bool:
-        return self.dependant.is_async_gen_callable or self.dependant.is_gen_callable
-
-    @property
-    def is_sse_stream(self) -> bool:
-        return self.is_generator and lenient_issubclass(
-            self.response_class, EventSourceResponse
-        )
-
-    @property
-    def is_json_stream(self) -> bool:
-        return self.is_generator and isinstance(self.response_class, DefaultPlaceholder)
-
-    @cached_property
-    def _flat_dependant(self):
-        return get_flat_dependant(self.dependant)
-
-    @cached_property
-    def _embed_body_fields(self):
-        return _should_embed_body_fields(self._flat_dependant.body_params)
-
-    @cached_property
-    def response_field(self):
-        if self.response_model:
-            response_name = "Response_" + self.unique_id
-            return create_model_field(
-                name=response_name,
-                type_=self.response_model,
-                mode="serialization",
-            )
-        else:
-            return None
-
-    @cached_property
-    def stream_item_field(self) -> ModelField | None:
-        if not self.stream_item_type:
-            return None
-        stream_item_name = "StreamItem_" + self.unique_id
-        return create_model_field(
-            name=stream_item_name,
-            type_=self.stream_item_type,
-            mode="serialization",
-        )
-
-    @cached_property
-    def response_fields(self) -> dict[Union[int, str], ModelField]:
-        response_fields: dict[Union[int, str], ModelField] = {}
-        for additional_status_code, response in self.responses.items():
-            assert isinstance(response, dict), "An additional response must be a dict"
-            model = response.get("model")
-            if model:
-                assert is_body_allowed_for_status_code(additional_status_code), (
-                    f"Status code {additional_status_code} must not have a response body"
-                )
-                response_name = f"Response_{additional_status_code}_{self.unique_id}"
-                response_field = create_model_field(
-                    name=response_name, type_=model, mode="serialization"
-                )
-                response_fields[additional_status_code] = response_field
-        return response_fields
-
-    @cached_property
-    def body_field(self):
-        return get_body_field(
-            flat_dependant=self._flat_dependant,
-            name=self.unique_id,
-            embed_body_fields=self._embed_body_fields,
-        )
 
     @cached_property
     def app(self):
