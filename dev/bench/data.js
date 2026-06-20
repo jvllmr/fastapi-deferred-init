@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1781966892130,
+  "lastUpdate": 1781967271143,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -3981,6 +3981,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 1.8396136817687163",
             "extra": "mean: 41.66090946060001 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "committer": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "distinct": true,
+          "id": "c8a1fd2f150b0de1e2d119d68fb1aa8c00b27ceb",
+          "message": "chore: add more trove classifiers to package metadata\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>",
+          "timestamp": "2026-06-20T16:48:21+02:00",
+          "tree_id": "40a9090b2ff99c1fddf5c6a0ab80295b99d3a462",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/c8a1fd2f150b0de1e2d119d68fb1aa8c00b27ceb"
+        },
+        "date": 1781967270838,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 1.9323046371830435,
+            "unit": "iter/sec",
+            "range": "stddev: 0.024952357131746733",
+            "extra": "mean: 517.5167418000001 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.023082063985661816,
+            "unit": "iter/sec",
+            "range": "stddev: 3.038778884458685",
+            "extra": "mean: 43.323681999200026 sec\nrounds: 5"
           }
         ]
       }
