@@ -7,7 +7,18 @@ dependencies = ["fastapi>=0.137.2"]
 requires-python = ">=3.10"
 readme = "README.md"
 license = { text = "MIT" }
-classifiers = ["Framework :: FastAPI"]
+classifiers = [
+    "Environment :: Plugins",
+    "Framework :: FastAPI",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+]
 dynamic = ["version"]
 
 [project.urls]
