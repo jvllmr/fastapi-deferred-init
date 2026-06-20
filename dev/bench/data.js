@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1781983662812,
+  "lastUpdate": 1781983673864,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -4133,6 +4133,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 2.797173365557598",
             "extra": "mean: 48.503607732999996 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "938d6e33e421ad4535251ed414ab3a95bce7ca8c",
+          "message": "chore(deps): update pre-commit hook pre-commit/pre-commit-hooks to v6 (#100)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2026-06-20T21:21:13+02:00",
+          "tree_id": "df3049ec5994b747b1359ed328dbba561ed5fda4",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/938d6e33e421ad4535251ed414ab3a95bce7ca8c"
+        },
+        "date": 1781983673576,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 1.7178584452098098,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03155670910320834",
+            "extra": "mean: 582.1201407999979 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.020691052222442302,
+            "unit": "iter/sec",
+            "range": "stddev: 2.930896307157664",
+            "extra": "mean: 48.33006988960001 sec\nrounds: 5"
           }
         ]
       }
