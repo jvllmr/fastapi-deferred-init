@@ -12,6 +12,7 @@ dynamic = ["version"]
 
 [project.urls]
 Source = "https://github.com/jvllmr/fastapi-deferred-init"
+Changelog = "https://github.com/jvllmr/fastapi-deferred-init/releases"
 
 [build-system]
 requires = ["pdm-backend"]
