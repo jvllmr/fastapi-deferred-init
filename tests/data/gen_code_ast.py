@@ -13,11 +13,6 @@ base_module = ast.Module(
             names=[ast.alias(name="JSONResponse")],
             level=0,
         ),
-        ast.ImportFrom(
-            module="fastapi_deferred_init",
-            names=[ast.alias(name="DeferringAPIRouter")],
-            level=0,
-        ),
         ast.Assign(
             targets=[ast.Name(id="dependency0", ctx=ast.Store())],
             value=ast.Lambda(
@@ -58,14 +53,12 @@ def gen_func_def(n=1, last=False):
     )
 
 
-def gen_router(n=2, last=False, use_lib=True):
+def gen_router(n=2, last=False):
     return [
         ast.Assign(
             targets=[ast.Name(id=f"router{'' if last else n}", ctx=ast.Store())],
             value=ast.Call(
-                func=ast.Name(
-                    id="DeferringAPIRouter" if use_lib else "APIRouter", ctx=ast.Load()
-                ),
+                func=ast.Name(id="APIRouter", ctx=ast.Load()),
                 args=[],
                 keywords=[
                     ast.keyword(
@@ -151,7 +144,9 @@ def gen_router(n=2, last=False, use_lib=True):
     )
 
 
-def get_tree(n=1000, use_lib=True):
+def get_tree(
+    n=1000,
+):
     module = copy.deepcopy(base_module)
     for i in range(1, n + 1):
         module.body.append(gen_func_def(i))
@@ -159,16 +154,24 @@ def get_tree(n=1000, use_lib=True):
     module.body.append(gen_func_def(i + 1, True))
 
     for i in range(n):
-        module.body.extend(gen_router(i, use_lib=use_lib))
+        module.body.extend(
+            gen_router(
+                i,
+            )
+        )
 
-    module.body.extend(gen_router(i + 1, True, use_lib))
+    module.body.extend(gen_router(i + 1, True))
 
     ast.fix_missing_locations(module)
     return module
 
 
-def create_code(n=1000, use_lib=True):
-    tree = get_tree(n, use_lib)
+def create_code(
+    n=1000,
+):
+    tree = get_tree(
+        n,
+    )
 
     with open("tests/data/code.py", "w") as f:
         f.write(ast.unparse(tree))

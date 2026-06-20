@@ -1,3 +1,3 @@
-from .routing import DeferringAPIRoute, DeferringAPIRouter
+from .patch import apply_patch
 
-__all__ = ["DeferringAPIRoute", "DeferringAPIRouter"]
+__all__ = ["apply_patch"]

@@ -2,12 +2,11 @@ import os
 
 import pytest
 from pydantic import BaseModel
-from starlette.routing import Route
 
 from fastapi import APIRouter, FastAPI
-from fastapi.routing import APIRoute
+from fastapi.routing import iter_route_contexts
 from fastapi.testclient import TestClient
-from fastapi_deferred_init import DeferringAPIRoute, DeferringAPIRouter
+from fastapi_deferred_init.routing import _populate_api_route_state
 
 from .data.gen_code_ast import create_code
 from .helpers import import_via_file_path, load_code
@@ -19,9 +18,15 @@ def skip_test(use_lib: bool):
 
 
 @pytest.mark.parametrize(["use_lib"], [(True,), (False,)])
-def test_basic(use_lib: bool, benchmark):
+def test_basic(use_lib: bool, benchmark, monkeypatch):
     skip_test(use_lib=use_lib)
-    create_code(50, use_lib=use_lib)  # switch bool to compare
+    if use_lib:
+        monkeypatch.setattr(
+            "fastapi.routing._populate_api_route_state", _populate_api_route_state
+        )
+    create_code(
+        50,
+    )
 
     generated_code = benchmark(load_code)
 
@@ -30,22 +35,23 @@ def test_basic(use_lib: bool, benchmark):
 
     app.include_router(router)
 
-    assert type(router) is (DeferringAPIRouter if use_lib else APIRouter)
     client = TestClient(app)
-    assert len(app.routes) == 54
-    for route in app.routes:
-        if route in router.routes:
-            assert type(route) is (DeferringAPIRoute if use_lib else APIRoute)
-        assert isinstance(route, Route)
+    routes = list(iter_route_contexts(app.routes))
+    assert len(routes) == 54
+    for route in routes:
         resp = client.get(route.path)
         assert resp.status_code == 200
 
 
 @pytest.mark.parametrize(["use_lib"], [(True,), (False,)])
-def test_with_pydantic_model(use_lib: bool):
+def test_with_pydantic_model(use_lib: bool, monkeypatch):
     skip_test(use_lib=use_lib)
+    if use_lib:
+        monkeypatch.setattr(
+            "fastapi.routing._populate_api_route_state", _populate_api_route_state
+        )
     app = FastAPI()
-    router = DeferringAPIRouter() if use_lib else APIRouter()
+    router = APIRouter()
 
     class Login(BaseModel):
         username: str
@@ -68,8 +74,10 @@ def test_with_pydantic_model(use_lib: bool):
 
 
 def test_fastapi_openapi_schema(monkeypatch):
-    monkeypatch.setattr("fastapi.routing.APIRoute", DeferringAPIRoute)
-    monkeypatch.setattr("fastapi.routing.APIRouter", DeferringAPIRouter)
+    monkeypatch.setattr(
+        "fastapi.routing._populate_api_route_state", _populate_api_route_state
+    )
+
     import_via_file_path(
         "fastapi_clone.tests.test_additional_properties",
         "fastapi/tests/test_additional_properties.py",
@@ -92,8 +100,9 @@ def test_fastapi_openapi_schema(monkeypatch):
 
 
 def test_fastapi_sse(monkeypatch):
-    monkeypatch.setattr("fastapi.routing.APIRoute", DeferringAPIRoute)
-    monkeypatch.setattr("fastapi.routing.APIRouter", DeferringAPIRouter)
+    monkeypatch.setattr(
+        "fastapi.routing._populate_api_route_state", _populate_api_route_state
+    )
     import_via_file_path(
         "fastapi_clone.tests.test_sse",
         "fastapi/tests/test_sse.py",
