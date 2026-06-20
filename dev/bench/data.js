@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1781967271143,
+  "lastUpdate": 1781983639346,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -4019,6 +4019,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 3.038778884458685",
             "extra": "mean: 43.323681999200026 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e77fcbda8f5b4e861b11029143c5cda2e1506c48",
+          "message": "chore(deps): update pre-commit hook pre-commit/mirrors-mypy to v2 (#99)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2026-06-20T21:20:53+02:00",
+          "tree_id": "821bf1ec8c6036194ef70ccd2bc69253636dbe99",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/e77fcbda8f5b4e861b11029143c5cda2e1506c48"
+        },
+        "date": 1781983639076,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 1.8612918512152383,
+            "unit": "iter/sec",
+            "range": "stddev: 0.021454233938478486",
+            "extra": "mean: 537.2612571999923 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.021346522226100225,
+            "unit": "iter/sec",
+            "range": "stddev: 3.010793175645979",
+            "extra": "mean: 46.8460384042 sec\nrounds: 5"
           }
         ]
       }
