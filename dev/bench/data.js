@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1781960627542,
+  "lastUpdate": 1781965298071,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -3867,6 +3867,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.022078423267399297",
             "extra": "mean: 563.0789668000006 msec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "committer": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "distinct": true,
+          "id": "29bd64005e932f31ecd0a3bb6aafe44c07b5ff0a",
+          "message": "fix: test was broken after disabling unconditional patch\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>",
+          "timestamp": "2026-06-20T16:15:02+02:00",
+          "tree_id": "8e0fc65ae505995271aa8b0a84983edc37cf4a7e",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/29bd64005e932f31ecd0a3bb6aafe44c07b5ff0a"
+        },
+        "date": 1781965297119,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 1.7975993752778587,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0304469868556886",
+            "extra": "mean: 556.2974785999955 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.021504153046627006,
+            "unit": "iter/sec",
+            "range": "stddev: 2.565034162668797",
+            "extra": "mean: 46.502645225399995 sec\nrounds: 5"
           }
         ]
       }
