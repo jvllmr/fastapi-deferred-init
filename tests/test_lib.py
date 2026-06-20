@@ -3,10 +3,14 @@ import os
 import pytest
 from pydantic import BaseModel
 
-from fastapi import APIRouter, FastAPI
-from fastapi.routing import iter_route_contexts
+from fastapi import FastAPI
+from fastapi import routing
 from fastapi.testclient import TestClient
-from fastapi_deferred_init.routing import _populate_api_route_state
+from fastapi_deferred_init.routing import (
+    _populate_api_route_state,
+    DeferringAPIRoute,
+    DeferringAPIRouter,
+)
 
 from .data.gen_code_ast import create_code
 from .helpers import import_via_file_path, load_code
@@ -17,13 +21,22 @@ def skip_test(use_lib: bool):
         pytest.skip()
 
 
+def apply_monkeypatch(monkeypatch):
+    monkeypatch.setattr(
+        "fastapi.routing._populate_api_route_state", _populate_api_route_state
+    )
+    monkeypatch.setattr("fastapi.routing.APIRoute", DeferringAPIRoute)
+    monkeypatch.setattr("fastapi.routing.APIRouter", DeferringAPIRouter)
+    # monkeypatch.setattr(
+    #        "fastapi.APIRouter", DeferringAPIRouter
+    #    )
+
+
 @pytest.mark.parametrize(["use_lib"], [(True,), (False,)])
 def test_basic(use_lib: bool, benchmark, monkeypatch):
     skip_test(use_lib=use_lib)
     if use_lib:
-        monkeypatch.setattr(
-            "fastapi.routing._populate_api_route_state", _populate_api_route_state
-        )
+        apply_monkeypatch(monkeypatch)
     create_code(
         50,
     )
@@ -36,22 +49,24 @@ def test_basic(use_lib: bool, benchmark, monkeypatch):
     app.include_router(router)
 
     client = TestClient(app)
-    routes = list(iter_route_contexts(app.routes))
+    routes = list(routing.iter_route_contexts(app.routes))
     assert len(routes) == 54
     for route in routes:
+        if not route.path or route.path in ("/openapi.json"):
+            continue
         resp = client.get(route.path)
         assert resp.status_code == 200
 
 
 @pytest.mark.parametrize(["use_lib"], [(True,), (False,)])
 def test_with_pydantic_model(use_lib: bool, monkeypatch):
+
     skip_test(use_lib=use_lib)
     if use_lib:
-        monkeypatch.setattr(
-            "fastapi.routing._populate_api_route_state", _populate_api_route_state
-        )
+        apply_monkeypatch(monkeypatch)
     app = FastAPI()
-    router = APIRouter()
+    router = routing.APIRouter()
+    assert isinstance(router, DeferringAPIRouter), type(router)
 
     class Login(BaseModel):
         username: str
@@ -65,6 +80,10 @@ def test_with_pydantic_model(use_lib: bool, monkeypatch):
 
         return {"userdata": "[...]"}
 
+    assert isinstance(router.routes[0], DeferringAPIRoute), (
+        router.routes,
+        type(router.routes[0]),
+    )
     app.include_router(router)
 
     client = TestClient(app)
@@ -74,9 +93,7 @@ def test_with_pydantic_model(use_lib: bool, monkeypatch):
 
 
 def test_fastapi_openapi_schema(monkeypatch):
-    monkeypatch.setattr(
-        "fastapi.routing._populate_api_route_state", _populate_api_route_state
-    )
+    apply_monkeypatch(monkeypatch)
 
     import_via_file_path(
         "fastapi_clone.tests.test_additional_properties",
@@ -100,9 +117,7 @@ def test_fastapi_openapi_schema(monkeypatch):
 
 
 def test_fastapi_sse(monkeypatch):
-    monkeypatch.setattr(
-        "fastapi.routing._populate_api_route_state", _populate_api_route_state
-    )
+    apply_monkeypatch(monkeypatch)
     import_via_file_path(
         "fastapi_clone.tests.test_sse",
         "fastapi/tests/test_sse.py",

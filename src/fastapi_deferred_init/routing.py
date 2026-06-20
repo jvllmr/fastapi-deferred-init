@@ -2,18 +2,15 @@ from fastapi.dependencies.models import Dependant
 import inspect
 from enum import Enum, IntEnum
 from functools import cached_property
-from typing import Any, Callable, Union
+from typing import Any, Callable, Union, cast
 from collections.abc import Sequence
 
-from starlette.routing import BaseRoute
-from starlette.routing import Mount as Mount  # noqa
-from starlette.routing import compile_path, get_name
 
 from fastapi.sse import (
     EventSourceResponse,
     ServerSentEvent,
 )
-from fastapi import params, routing  # type:ignore
+from fastapi import params, routing  # type: ignore[attr-defined]
 from fastapi._compat import ModelField, lenient_issubclass
 from fastapi.datastructures import Default, DefaultPlaceholder
 from fastapi.dependencies.utils import (
@@ -75,7 +72,7 @@ def _populate_api_route_state(
     include_in_schema: bool = True,
     response_class: type[Response] | DefaultPlaceholder = Default(JSONResponse),
     dependency_overrides_provider: Any | None = None,
-    callbacks: list[BaseRoute] | None = None,
+    callbacks: list[routing.BaseRoute] | None = None,
     openapi_extra: dict[str, Any] | None = None,
     generate_unique_id_function: Callable[[Any], str] | DefaultPlaceholder = Default(
         generate_unique_id
@@ -126,8 +123,10 @@ def _populate_api_route_state(
     route.strict_content_type = strict_content_type
     route.tags = tags or []
     route.responses = responses or {}
-    route.name = get_name(endpoint) if name is None else name
-    route.path_regex, route.path_format, route.param_convertors = compile_path(path)
+    route.name = routing.get_name(endpoint) if name is None else name
+    route.path_regex, route.path_format, route.param_convertors = routing.compile_path(
+        path
+    )
     if methods is None:
         methods = ["GET"]
     route.methods = {method.upper() for method in methods}
@@ -249,3 +248,23 @@ def _populate_api_route_state(
         return self.is_generator and isinstance(self.response_class, DefaultPlaceholder)
 
     _add_cache_attribute(route, "is_json_stream", _is_json_stream)
+
+
+class DeferringAPIRoute(routing.APIRoute):
+    def __init__(
+        self, path: str, endpoint: Callable[..., Any], *args, **kwargs
+    ) -> None:
+        _populate_api_route_state(
+            cast(routing._APIRouteLike, self), path, endpoint, *args, **kwargs
+        )
+
+    @cached_property
+    def app(self):
+        return routing.request_response(self.get_route_handler())
+
+
+class DeferringAPIRouter(routing.APIRouter):
+    def __init__(self, *args, **kwargs):
+        if "route_class" not in kwargs:
+            kwargs["route_class"] = DeferringAPIRoute
+        super().__init__(*args, **kwargs)
