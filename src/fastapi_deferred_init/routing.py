@@ -1,4 +1,3 @@
-from fastapi.routing import _EffectiveRouteContext
 from fastapi.dependencies.models import Dependant
 import inspect
 from enum import Enum, IntEnum
@@ -39,7 +38,9 @@ def _add_cache_attribute(
     instance: routing._APIRouteLike, name: str, func: Callable[[Any], Any]
 ) -> None:
     cls = type(instance)
-    if hasattr(instance,name) and ((val := getattr(instance, name)) is None or val is False):
+    if hasattr(instance, name) and (
+        (val := getattr(instance, name)) is None or val is False
+    ):
         delattr(instance, name)
 
     if not hasattr(cls, name) or not isinstance(getattr(cls, name), cached_property):
