@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1781983639346,
+  "lastUpdate": 1781983649121,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -4057,6 +4057,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 3.010793175645979",
             "extra": "mean: 46.8460384042 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "389d0f704fe307017367368f0176e6b05be5d8d6",
+          "message": "chore(deps): update dependency mypy to v2 (#98)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2026-06-20T21:21:23+02:00",
+          "tree_id": "f0290ffd001aeeb2857bfbca05a1f3747ce8fb5b",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/389d0f704fe307017367368f0176e6b05be5d8d6"
+        },
+        "date": 1781983648847,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 1.9850039699087016,
+            "unit": "iter/sec",
+            "range": "stddev: 0.020589633338568874",
+            "extra": "mean: 503.77732999999694 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.023171029516517404,
+            "unit": "iter/sec",
+            "range": "stddev: 3.4332937838294826",
+            "extra": "mean: 43.1573400434 sec\nrounds: 5"
           }
         ]
       }
