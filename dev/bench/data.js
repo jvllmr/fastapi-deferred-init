@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1781500124374,
+  "lastUpdate": 1781955937787,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -3791,6 +3791,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 3.2686691325498543",
             "extra": "mean: 46.4629653688 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "committer": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "distinct": true,
+          "id": "d7f990cadcf488f9d28a8993620d9619a86eb6df",
+          "message": "chore: fix linting\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>",
+          "timestamp": "2026-06-20T13:34:15+02:00",
+          "tree_id": "971f90aa6f2cfa8cd16ca791e8f7eba98f893387",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/d7f990cadcf488f9d28a8993620d9619a86eb6df"
+        },
+        "date": 1781955937107,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 0.028103355415531148,
+            "unit": "iter/sec",
+            "range": "stddev: 1.560973440062125",
+            "extra": "mean: 35.58293966020001 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.01973138054846377,
+            "unit": "iter/sec",
+            "range": "stddev: 2.68286497294762",
+            "extra": "mean: 50.68069097059998 sec\nrounds: 5"
           }
         ]
       }
