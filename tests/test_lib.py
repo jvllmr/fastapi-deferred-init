@@ -66,7 +66,9 @@ def test_with_pydantic_model(use_lib: bool, monkeypatch):
         apply_monkeypatch(monkeypatch)
     app = FastAPI()
     router = routing.APIRouter()
-    assert isinstance(router, DeferringAPIRouter), type(router)
+    assert isinstance(router, DeferringAPIRouter if use_lib else routing.APIRouter), (
+        type(router)
+    )
 
     class Login(BaseModel):
         username: str
@@ -80,7 +82,9 @@ def test_with_pydantic_model(use_lib: bool, monkeypatch):
 
         return {"userdata": "[...]"}
 
-    assert isinstance(router.routes[0], DeferringAPIRoute), (
+    assert isinstance(
+        router.routes[0], DeferringAPIRoute if use_lib else routing.APIRoute
+    ), (
         router.routes,
         type(router.routes[0]),
     )
