@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1781955937787,
+  "lastUpdate": 1781960627542,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -3829,6 +3829,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 2.68286497294762",
             "extra": "mean: 50.68069097059998 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "committer": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "distinct": true,
+          "id": "2c870279fa0802e5be35c2c6b676c6e21a37743f",
+          "message": "fix: revert performance regression\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>",
+          "timestamp": "2026-06-20T15:02:51+02:00",
+          "tree_id": "3a69fe67ed8486858ca38ffeea9c4f957f9bc538",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/2c870279fa0802e5be35c2c6b676c6e21a37743f"
+        },
+        "date": 1781960626794,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 1.8662465515757634,
+            "unit": "iter/sec",
+            "range": "stddev: 0.039810955786118825",
+            "extra": "mean: 535.834881599996 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 1.7759498382314625,
+            "unit": "iter/sec",
+            "range": "stddev: 0.022078423267399297",
+            "extra": "mean: 563.0789668000006 msec\nrounds: 5"
           }
         ]
       }
