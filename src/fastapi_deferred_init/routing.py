@@ -35,11 +35,13 @@ def _add_cache_attribute(
     instance: routing._APIRouteLike, name: str, func: Callable[[Any], Any]
 ) -> None:
     cls = type(instance)
-    if hasattr(instance, name) and (
-        (val := getattr(instance, name)) is None or val is False
+
+    if name in instance.__dict__ and (
+        (val := instance.__dict__[name]) is None or val is False
     ):
         delattr(instance, name)
 
+    # replace attribute with cached_property
     if not hasattr(cls, name) or not isinstance(getattr(cls, name), cached_property):
         prop = cached_property(func)
         setattr(cls, name, prop)

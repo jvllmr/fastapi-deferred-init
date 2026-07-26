@@ -7,4 +7,8 @@ def apply_patch() -> None:
 
     routing._populate_api_route_state = _populate_api_route_state  # ty:ignore[invalid-assignment]
     routing.APIRoute = DeferringAPIRoute  # ty:ignore[invalid-assignment]
-    routing.APIRouter = DeferringAPIRouter
+    routing.APIRouter = DeferringAPIRouter  # ty:ignore[invalid-assignment]
+
+    import fastapi
+
+    fastapi.APIRouter = DeferringAPIRouter  # type:ignore[attr-defined]  # ty:ignore[invalid-assignment]

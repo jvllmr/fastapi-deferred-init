@@ -3,7 +3,7 @@ import os
 import pytest
 from pydantic import BaseModel
 
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi import routing
 from fastapi.testclient import TestClient
 from fastapi_deferred_init.routing import (
@@ -27,9 +27,7 @@ def apply_monkeypatch(monkeypatch):
     )
     monkeypatch.setattr("fastapi.routing.APIRoute", DeferringAPIRoute)
     monkeypatch.setattr("fastapi.routing.APIRouter", DeferringAPIRouter)
-    # monkeypatch.setattr(
-    #        "fastapi.APIRouter", DeferringAPIRouter
-    #    )
+    monkeypatch.setattr("fastapi.APIRouter", DeferringAPIRouter)
 
 
 @pytest.mark.parametrize(["use_lib"], [(True,), (False,)])
@@ -42,7 +40,7 @@ def test_basic(use_lib: bool, benchmark, monkeypatch):
     )
 
     generated_code = benchmark(load_code)
-
+    assert generated_code.APIRouter is (DeferringAPIRouter if use_lib else APIRouter)
     app = FastAPI()
     router = generated_code.router
 
