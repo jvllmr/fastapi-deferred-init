@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1783316689169,
+  "lastUpdate": 1785095431003,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -4323,6 +4323,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 2.6834442243418466",
             "extra": "mean: 47.89218833380001 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "committer": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "distinct": true,
+          "id": "de2bc322f97a847f4e4ee045521dbc2d3e4b6751",
+          "message": "fix: improve performance by removing unneeded instance attribute access\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>",
+          "timestamp": "2026-07-26T21:43:35+02:00",
+          "tree_id": "f9ba8d21f5e400122fcd98fb8849ae06a7d042a7",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/de2bc322f97a847f4e4ee045521dbc2d3e4b6751"
+        },
+        "date": 1785095430707,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 2.868507138251891,
+            "unit": "iter/sec",
+            "range": "stddev: 0.029441121686238463",
+            "extra": "mean: 348.61339080000135 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.021028001036071428,
+            "unit": "iter/sec",
+            "range": "stddev: 2.630290885368576",
+            "extra": "mean: 47.55563775580001 sec\nrounds: 5"
           }
         ]
       }
