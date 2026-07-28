@@ -10,17 +10,18 @@ from fastapi.sse import (
     EventSourceResponse,
     ServerSentEvent,
 )
+from fastapi.routing import _is_async_gen_callable, _is_gen_callable
 from fastapi import params, routing  # type: ignore[attr-defined]
 from fastapi._compat import ModelField, lenient_issubclass
 from fastapi.datastructures import Default, DefaultPlaceholder
 from fastapi.dependencies.utils import (
     _should_embed_body_fields,
-    get_body_field,
+    _get_body_field,
     get_dependant,
-    get_flat_dependant,
     get_parameterless_sub_dependant,
     get_typed_return_annotation,
     get_stream_item_type,
+    _get_flat_body_params,
 )
 from fastapi.responses import JSONResponse, Response
 from fastapi.types import IncEx
@@ -214,20 +215,20 @@ def _populate_api_route_state(
 
     _add_cache_attribute(route, "dependant", _get_dependant)
 
-    def _get_flat_dependant(self) -> Dependant:
-        return get_flat_dependant(self.dependant)
+    def _flat_body_params(self) -> list[ModelField]:
+        return _get_flat_body_params(self.dependant)
 
-    _add_cache_attribute(route, "_flat_dependant", _get_flat_dependant)
+    _add_cache_attribute(route, "_flat_body_params", _flat_body_params)
 
     def _embed_body_fields(self):
-        return _should_embed_body_fields(self._flat_dependant.body_params)
+        return _should_embed_body_fields(self._flat_body_params)
 
     _add_cache_attribute(route, "_embed_body_fields", _embed_body_fields)
 
     def _body_field(self):
-        return get_body_field(
-            flat_dependant=self._flat_dependant,
+        return _get_body_field(
             name=self.unique_id,
+            body_params=self._flat_body_params,
             embed_body_fields=self._embed_body_fields,
         )
 
@@ -235,7 +236,9 @@ def _populate_api_route_state(
 
     # Detect generator endpoints that should stream as JSONL or SSE
     def _is_generator(self) -> bool:
-        return self.dependant.is_async_gen_callable or self.dependant.is_gen_callable
+        return _is_async_gen_callable(self.dependant.call) or _is_gen_callable(
+            self.dependant.call
+        )
 
     _add_cache_attribute(route, "is_generator", _is_generator)
 
