@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1785095431003,
+  "lastUpdate": 1785232891187,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -4361,6 +4361,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 2.630290885368576",
             "extra": "mean: 47.55563775580001 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "committer": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "distinct": true,
+          "id": "3b441289300f5fddbff001c09db2b295ac7bbc22",
+          "message": "fix: compatibility with fastapi 0.140.7",
+          "timestamp": "2026-07-28T11:56:10+02:00",
+          "tree_id": "942d013dbca9bebf7ccd92d694b184536df5bce1",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/3b441289300f5fddbff001c09db2b295ac7bbc22"
+        },
+        "date": 1785232890305,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 2.903977091179858,
+            "unit": "iter/sec",
+            "range": "stddev: 0.02654934033167672",
+            "extra": "mean: 344.3553336000008 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.04792318887986608,
+            "unit": "iter/sec",
+            "range": "stddev: 2.22839660275744",
+            "extra": "mean: 20.8667249274 sec\nrounds: 5"
           }
         ]
       }
