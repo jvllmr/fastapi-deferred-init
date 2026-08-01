@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1785232891187,
+  "lastUpdate": 1785573654983,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -4399,6 +4399,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 2.22839660275744",
             "extra": "mean: 20.8667249274 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "29139614+renovate[bot]@users.noreply.github.com",
+            "name": "renovate[bot]",
+            "username": "renovate[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1e636e793432e47e7483f9bec37fa446c58da4e0",
+          "message": "chore(deps): lock file maintenance (#106)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>",
+          "timestamp": "2026-08-01T08:35:29Z",
+          "tree_id": "ee82ebafddaa1c9601f73b1d1984ec5526a340ed",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/1e636e793432e47e7483f9bec37fa446c58da4e0"
+        },
+        "date": 1785573654113,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 2.857966498590876,
+            "unit": "iter/sec",
+            "range": "stddev: 0.029243094045685782",
+            "extra": "mean: 349.8991330000024 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.04381429702697096,
+            "unit": "iter/sec",
+            "range": "stddev: 3.9347882259817912",
+            "extra": "mean: 22.823600236799997 sec\nrounds: 5"
           }
         ]
       }
