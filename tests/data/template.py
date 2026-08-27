@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 
-dependency0 = lambda: 1  # noqa: E731
+dependency0 = lambda: 1
 
-dependency = lambda: 0  # noqa: E731
+dependency = lambda: 0
 
 
 def dependency1(sub_dependant: int = Depends(dependency0)):

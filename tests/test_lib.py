@@ -1,15 +1,14 @@
 import os
 
 import pytest
+from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
-from fastapi import FastAPI, APIRouter
-from fastapi import routing
-from fastapi.testclient import TestClient
+from fastapi import APIRouter, FastAPI, routing
 from fastapi_deferred_init.routing import (
-    _populate_api_route_state,
     DeferringAPIRoute,
     DeferringAPIRouter,
+    _populate_api_route_state,
 )
 
 from .data.gen_code_ast import create_code
@@ -107,10 +106,10 @@ def test_fastapi_openapi_schema(monkeypatch):
         "fastapi/tests/test_openapi_examples.py",
     )
 
-    from fastapi_clone.tests.test_additional_properties import (  # noqa # type: ignore
+    from fastapi_clone.tests.test_additional_properties import (  # type: ignore
         test_openapi_schema as fastapi_test_openapi_schema_additional,
     )
-    from fastapi_clone.tests.test_openapi_examples import (  # noqa # type: ignore
+    from fastapi_clone.tests.test_openapi_examples import (  # type: ignore
         test_openapi_schema as fastapi_test_openapi_schema,
     )
 
@@ -125,9 +124,11 @@ def test_fastapi_sse(monkeypatch):
         "fastapi/tests/test_sse.py",
     )
 
+    from fastapi_clone.tests.test_sse import (
+        client_fixture as fastapi_client_fixture,
+    )
     from fastapi_clone.tests.test_sse import (  # type: ignore
         test_raw_data_sent_without_json_encoding as fastapi_test_raw_data_sent_without_json_encoding,
-        client_fixture as fastapi_client_fixture,
     )
 
     for client in fastapi_client_fixture.__wrapped__():
