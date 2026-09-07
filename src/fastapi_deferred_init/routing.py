@@ -1,35 +1,35 @@
-from fastapi.dependencies.models import Dependant
 import inspect
+from collections.abc import Callable, Sequence
 from enum import Enum, IntEnum
 from functools import cached_property
-from typing import Any, Callable, Union, cast
-from collections.abc import Sequence
+from typing import Any, cast
 
-
+from fastapi._compat import ModelField, lenient_issubclass
+from fastapi.datastructures import Default, DefaultPlaceholder
+from fastapi.dependencies.models import Dependant
+from fastapi.dependencies.utils import (
+    _get_body_field,
+    _get_flat_body_params,
+    _should_embed_body_fields,
+    get_dependant,
+    get_parameterless_sub_dependant,
+    get_stream_item_type,
+    get_typed_return_annotation,
+)
+from fastapi.responses import JSONResponse, Response
+from fastapi.routing import _is_async_gen_callable, _is_gen_callable
 from fastapi.sse import (
     EventSourceResponse,
     ServerSentEvent,
 )
-from fastapi.routing import _is_async_gen_callable, _is_gen_callable
-from fastapi import params, routing  # type: ignore[attr-defined]
-from fastapi._compat import ModelField, lenient_issubclass
-from fastapi.datastructures import Default, DefaultPlaceholder
-from fastapi.dependencies.utils import (
-    _should_embed_body_fields,
-    _get_body_field,
-    get_dependant,
-    get_parameterless_sub_dependant,
-    get_typed_return_annotation,
-    get_stream_item_type,
-    _get_flat_body_params,
-)
-from fastapi.responses import JSONResponse, Response
 from fastapi.types import IncEx
 from fastapi.utils import (
     create_model_field,
     generate_unique_id,
     is_body_allowed_for_status_code,
 )
+
+from fastapi import params, routing  # type: ignore[attr-defined]
 
 
 def _add_cache_attribute(
@@ -180,8 +180,8 @@ def _populate_api_route_state(
     # truncate description text to the content preceding the first "form feed"
     route.description = route.description.split("\f")[0].strip()
 
-    def _response_fields(self) -> dict[Union[int, str], ModelField]:
-        response_fields: dict[Union[int, str], ModelField] = {}
+    def _response_fields(self) -> dict[int | str, ModelField]:
+        response_fields: dict[int | str, ModelField] = {}
         for additional_status_code, response in self.responses.items():
             assert isinstance(response, dict), "An additional response must be a dict"
             model = response.get("model")
