@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1788267139617,
+  "lastUpdate": 1788896131909,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -4475,6 +4475,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 2.901275242660081",
             "extra": "mean: 12.882555998000004 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "84982eab321a4ef432c304df20fa228b1823fee1",
+          "message": "chore: compatibility with fastapi 0.141.1 (#108)\n\n* chore: compatibility with fastapi 0.141.1\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>\n\n* [pre-commit.ci] auto fixes from pre-commit.com hooks\n\nfor more information, see https://pre-commit.ci\n\n* more noqa\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>\n\n---------\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>\nCo-authored-by: pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>",
+          "timestamp": "2026-09-08T21:30:46+02:00",
+          "tree_id": "2310992982355ca0766598f4c3d68d75d3cac993",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/84982eab321a4ef432c304df20fa228b1823fee1"
+        },
+        "date": 1788896131176,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 2.887106605611086,
+            "unit": "iter/sec",
+            "range": "stddev: 0.022289625209167913",
+            "extra": "mean: 346.36753560000244 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.049185045132350384,
+            "unit": "iter/sec",
+            "range": "stddev: 2.0695024102859985",
+            "extra": "mean: 20.331383193999997 sec\nrounds: 5"
           }
         ]
       }
