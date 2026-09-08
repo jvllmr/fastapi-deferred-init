@@ -1,35 +1,35 @@
-from fastapi.dependencies.models import Dependant
 import inspect
+from collections.abc import Callable, Sequence
 from enum import Enum, IntEnum
 from functools import cached_property
-from typing import Any, Callable, Union, cast
-from collections.abc import Sequence
+from typing import Any, cast
 
-
+from fastapi._compat import ModelField, lenient_issubclass
+from fastapi.datastructures import Default, DefaultPlaceholder
+from fastapi.dependencies.models import Dependant
+from fastapi.dependencies.utils import (
+    _get_body_field,
+    _get_flat_body_params,
+    _should_embed_body_fields,
+    get_dependant,
+    get_parameterless_sub_dependant,
+    get_stream_item_type,
+    get_typed_return_annotation,
+)
+from fastapi.responses import JSONResponse, Response
+from fastapi.routing import _is_async_gen_callable, _is_gen_callable
 from fastapi.sse import (
     EventSourceResponse,
     ServerSentEvent,
 )
-from fastapi.routing import _is_async_gen_callable, _is_gen_callable
-from fastapi import params, routing  # type: ignore[attr-defined]
-from fastapi._compat import ModelField, lenient_issubclass
-from fastapi.datastructures import Default, DefaultPlaceholder
-from fastapi.dependencies.utils import (
-    _should_embed_body_fields,
-    _get_body_field,
-    get_dependant,
-    get_parameterless_sub_dependant,
-    get_typed_return_annotation,
-    get_stream_item_type,
-    _get_flat_body_params,
-)
-from fastapi.responses import JSONResponse, Response
 from fastapi.types import IncEx
 from fastapi.utils import (
     create_model_field,
     generate_unique_id,
     is_body_allowed_for_status_code,
 )
+
+from fastapi import params, routing  # type: ignore[attr-defined]
 
 
 def _add_cache_attribute(
@@ -54,7 +54,7 @@ def _populate_api_route_state(
     path: str,
     endpoint: Callable[..., Any],
     *,
-    response_model: Any = Default(None),
+    response_model: Any = Default(None),  # noqa: B008
     status_code: int | None = None,
     tags: list[str | Enum] | None = None,
     dependencies: Sequence[params.Depends] | None = None,
@@ -73,40 +73,20 @@ def _populate_api_route_state(
     response_model_exclude_defaults: bool = False,
     response_model_exclude_none: bool = False,
     include_in_schema: bool = True,
-    response_class: type[Response] | DefaultPlaceholder = Default(JSONResponse),
+    response_class: type[Response] | DefaultPlaceholder = Default(JSONResponse),  # noqa: B008
     dependency_overrides_provider: Any | None = None,
     callbacks: list[routing.BaseRoute] | None = None,
     openapi_extra: dict[str, Any] | None = None,
-    generate_unique_id_function: Callable[[Any], str] | DefaultPlaceholder = Default(
+    generate_unique_id_function: Callable[[Any], str] | DefaultPlaceholder = Default(  # noqa: B008
         generate_unique_id
     ),
-    strict_content_type: bool | DefaultPlaceholder = Default(True),
+    strict_content_type: bool | DefaultPlaceholder = Default(True),  # noqa: B008
+    stream_item_type: Any | None = None,
 ) -> None:
     route.path = path
     route.endpoint = endpoint
-    route.stream_item_type = None
-    if isinstance(response_model, DefaultPlaceholder):
-        return_annotation = get_typed_return_annotation(endpoint)
-        if lenient_issubclass(return_annotation, Response):
-            response_model = None
-        else:
-            stream_item = get_stream_item_type(return_annotation)
-            if stream_item is not None:
-                # Extract item type for JSONL or SSE streaming when
-                # response_class is DefaultPlaceholder (JSONL) or
-                # EventSourceResponse (SSE).
-                # ServerSentEvent is excluded: it's a transport
-                # wrapper, not a data model, so it shouldn't feed
-                # into validation or OpenAPI schema generation.
-                if (
-                    isinstance(response_class, DefaultPlaceholder)
-                    or lenient_issubclass(response_class, EventSourceResponse)
-                ) and not lenient_issubclass(stream_item, ServerSentEvent):
-                    route.stream_item_type = stream_item
-                response_model = None
-            else:
-                response_model = return_annotation
-    route.response_model = response_model
+    route.stream_item_type = stream_item_type
+
     route.summary = summary
     route.response_description = response_description
     route.deprecated = deprecated
@@ -144,13 +124,12 @@ def _populate_api_route_state(
     if isinstance(status_code, IntEnum):
         status_code = int(status_code)
     route.status_code = status_code
-    if route.response_model:
-        assert is_body_allowed_for_status_code(status_code), (
-            f"Status code {status_code} must not have a response body"
-        )
 
     def _response_field(self):
         if self.response_model:
+            assert is_body_allowed_for_status_code(status_code), (
+                f"Status code {status_code} must not have a response body"
+            )
             response_name = "Response_" + self.unique_id
             return create_model_field(
                 name=response_name,
@@ -180,8 +159,8 @@ def _populate_api_route_state(
     # truncate description text to the content preceding the first "form feed"
     route.description = route.description.split("\f")[0].strip()
 
-    def _response_fields(self) -> dict[Union[int, str], ModelField]:
-        response_fields: dict[Union[int, str], ModelField] = {}
+    def _response_fields(self) -> dict[int | str, ModelField]:
+        response_fields: dict[int | str, ModelField] = {}
         for additional_status_code, response in self.responses.items():
             assert isinstance(response, dict), "An additional response must be a dict"
             model = response.get("model")
@@ -253,6 +232,51 @@ def _populate_api_route_state(
         return self.is_generator and isinstance(self.response_class, DefaultPlaceholder)
 
     _add_cache_attribute(route, "is_json_stream", _is_json_stream)
+
+    def _resolved_response_model_stream_item(self):
+        nonlocal response_model, stream_item_type
+        resolved_model = response_model
+        resolved_item_type = stream_item_type
+        if isinstance(response_model, DefaultPlaceholder):
+            return_annotation = get_typed_return_annotation(endpoint)
+            if lenient_issubclass(return_annotation, Response):
+                resolved_model = None
+            else:
+                stream_item = get_stream_item_type(return_annotation)
+                if stream_item is not None and self.is_generator:
+                    # Extract item type for JSONL or SSE streaming for
+                    # generator endpoints when response_class is
+                    # DefaultPlaceholder (JSONL) or EventSourceResponse (SSE).
+                    # ServerSentEvent is excluded: it's a transport
+                    # wrapper, not a data model, so it shouldn't feed
+                    # into validation or OpenAPI schema generation.
+                    if (
+                        isinstance(response_class, DefaultPlaceholder)
+                        or lenient_issubclass(response_class, EventSourceResponse)
+                    ) and not lenient_issubclass(stream_item, ServerSentEvent):
+                        resolved_item_type = stream_item
+                    resolved_model = None
+                else:
+                    resolved_model = return_annotation
+
+        return resolved_model, resolved_item_type
+
+    _add_cache_attribute(
+        route,
+        "_resolved_response_model_stream_item",
+        _resolved_response_model_stream_item,
+    )
+
+    def _response_model(self):
+
+        return self._resolved_response_model_stream_item[0]
+
+    _add_cache_attribute(route, "response_model", _response_model)
+
+    def _stream_item_type(self):
+        return self._resolved_response_model_stream_item[1]
+
+    _add_cache_attribute(route, "stream_item_type", _stream_item_type)
 
 
 class DeferringAPIRoute(routing.APIRoute):

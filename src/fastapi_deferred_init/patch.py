@@ -1,4 +1,4 @@
-from .routing import _populate_api_route_state, DeferringAPIRoute, DeferringAPIRouter
+from .routing import DeferringAPIRoute, DeferringAPIRouter, _populate_api_route_state
 
 
 def apply_patch() -> None:
