@@ -10,7 +10,7 @@ repos:
     hooks:
       - id: pyaphid
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.16.9"
+    rev: "v0.16.10"
     hooks:
       - id: ruff
         args:
@@ -23,7 +23,7 @@ repos:
       - id: prettier
         additional_dependencies: [prettier@latest, prettier-plugin-toml@latest]
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v2.3.1"
+    rev: "v2.4.0"
     hooks:
       - id: mypy
         exclude: ^tests/.*
