@@ -202,7 +202,7 @@ def test_dependency_overrides(monkeypatch):
     router = routing.APIRouter()
 
     @router.get("/dep")
-    def get_dep(val: t.Annotated[Depends(original_dep)]):
+    def get_dep(val: t.Annotated[str, Depends(original_dep)]):
         return {"val": val}
 
     app = FastAPI()
