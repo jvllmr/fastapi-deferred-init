@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792392101052,
+  "lastUpdate": 1793397226288,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -4703,6 +4703,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 2.2794975402505218",
             "extra": "mean: 20.7748433856 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "81a4a535d42d0f51d0366bfab730eced675482ef",
+          "message": "build: replace prettier with oxfmt and pre-commit with prek (#114)\n\nSigned-off-by: Jan Vollmer <jan@vllmr.dev>",
+          "timestamp": "2026-10-30T22:48:51+01:00",
+          "tree_id": "bce2c23d91a3d21111f03a5607811a90df1dde23",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/81a4a535d42d0f51d0366bfab730eced675482ef"
+        },
+        "date": 1793397225497,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 2.9091150960027643,
+            "unit": "iter/sec",
+            "range": "stddev: 0.02443443312223057",
+            "extra": "mean: 343.747141999998 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.048774988565769894,
+            "unit": "iter/sec",
+            "range": "stddev: 2.0543198385934414",
+            "extra": "mean: 20.502311315800007 sec\nrounds: 5"
           }
         ]
       }
