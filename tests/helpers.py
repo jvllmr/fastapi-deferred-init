@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 from fastapi_deferred_init.routing import (
     DeferringAPIRoute,
     DeferringAPIRouter,
+    _from_api_route_deferred,
     _populate_api_route_state,
 )
 
@@ -50,3 +51,8 @@ def apply_monkeypatch(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("fastapi.routing.APIRoute", DeferringAPIRoute)
     monkeypatch.setattr("fastapi.routing.APIRouter", DeferringAPIRouter)
     monkeypatch.setattr("fastapi.APIRouter", DeferringAPIRouter)
+    monkeypatch.setattr(
+        "fastapi.routing._EffectiveRouteContext.from_api_route",
+        classmethod(_from_api_route_deferred),
+        raising=False,
+    )
