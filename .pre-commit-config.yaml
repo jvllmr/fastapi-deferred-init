@@ -22,11 +22,15 @@ repos:
     hooks:
       - id: oxfmt
         types_or: [javascript, jsx, ts, tsx, json, yaml, toml, markdown]
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v2.4.0"
+  - repo: local
     hooks:
-      - id: mypy
-        exclude: ^tests/.*
+      - id: ty
+        name: ty
+        entry: pdm run ty check
+        language: system
+        pass_filenames: false
+        always_run: true
+        require_serial: true
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:

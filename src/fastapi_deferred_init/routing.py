@@ -128,8 +128,8 @@ def _populate_api_route_state(
     # Store the raw response_model / stream_item_type parameters so the
     # deferred cached_properties can access them per-instance (not via
     # closure, which would be shared across all instances of the class).
-    route._raw_response_model = response_model  # type: ignore[attr-defined]
-    route._raw_stream_item_type = stream_item_type  # type: ignore[attr-defined]
+    route._raw_response_model = response_model  # ty: ignore[unresolved-attribute]
+    route._raw_stream_item_type = stream_item_type  # ty: ignore[unresolved-attribute]
 
     def _response_field(self):
         if self.response_model:

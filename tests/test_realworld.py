@@ -146,8 +146,8 @@ def test_response_model_not_leaked_between_routes(monkeypatch):
 
     # Check the original routes' response_model
     for r in router_b.routes:
-        assert r.response_model is None, (
-            f"Route {r.path} incorrectly has response_model={r.response_model} "
+        assert r.response_model is None, (  # ty: ignore[unresolved-attribute]
+            f"Route {r.path} incorrectly has response_model={r.response_model} "  # ty: ignore[unresolved-attribute]
             f"(leaked from another route)"
         )
 
