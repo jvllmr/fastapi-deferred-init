@@ -22,11 +22,10 @@ repos:
     hooks:
       - id: oxfmt
         types_or: [javascript, jsx, ts, tsx, json, yaml, toml, markdown]
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v2.4.0"
+  - repo: https://github.com/astral-sh/ty-pre-commit
+    rev: 18b2b8bb1b9b90d2d21283756e89b07fc9c747bf # v0.0.95
     hooks:
-      - id: mypy
-        exclude: ^tests/.*
+      - id: ty
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
