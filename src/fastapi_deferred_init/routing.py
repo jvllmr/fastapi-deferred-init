@@ -26,6 +26,7 @@ from fastapi.types import IncEx
 from fastapi.utils import (
     create_model_field,
     generate_unique_id,
+    get_value_or_default,
     is_body_allowed_for_status_code,
 )
 
@@ -302,3 +303,93 @@ class DeferringAPIRouter(routing.APIRouter):
         if "route_class" not in kwargs:
             kwargs["route_class"] = DeferringAPIRoute
         super().__init__(*args, **kwargs)
+
+
+def _from_api_route_deferred(
+    cls: type, *, original_route: Any, include_context: Any
+) -> Any:
+    """Deferring replacement for fastapi>=0.162's `_EffectiveRouteContext.from_api_route`.
+
+    Upstream eagerly builds the ASGI app for every route of an included router
+    (`context.app = request_response(original_route.get_route_handler())`),
+    which forces the deferred dependant/body_field/response_model to be
+    computed at include time. Defer `app` to first access instead, like
+    DeferringAPIRoute does for direct routes.
+    """
+    route = cast(routing._APIRouteLike, original_route)
+    context = cls(original_route=original_route)
+    _populate_api_route_state(
+        cast(routing._APIRouteLike, context),
+        include_context.path_for(original_route),
+        route.endpoint,
+        response_model=route.response_model,
+        status_code=route.status_code,
+        tags=[*include_context.tags, *route.tags],
+        dependencies=[*include_context.dependencies, *route.dependencies],
+        summary=route.summary,
+        description=route.description,
+        response_description=route.response_description,
+        responses={**include_context.responses, **route.responses},
+        deprecated=route.deprecated or include_context.deprecated,
+        methods=route.methods,
+        operation_id=route.operation_id,
+        response_model_include=route.response_model_include,
+        response_model_exclude=route.response_model_exclude,
+        response_model_by_alias=route.response_model_by_alias,
+        response_model_exclude_unset=route.response_model_exclude_unset,
+        response_model_exclude_defaults=route.response_model_exclude_defaults,
+        response_model_exclude_none=route.response_model_exclude_none,
+        include_in_schema=route.include_in_schema and include_context.include_in_schema,
+        response_class=get_value_or_default(
+            route.response_class,
+            include_context.included_router.default_response_class,
+            include_context.default_response_class,
+        ),
+        name=route.name,
+        dependency_overrides_provider=include_context.dependency_overrides_provider,
+        callbacks=[*include_context.callbacks, *(route.callbacks or [])],
+        openapi_extra=route.openapi_extra,
+        generate_unique_id_function=get_value_or_default(
+            route.generate_unique_id_function,
+            include_context.included_router.generate_unique_id_function,
+            include_context.generate_unique_id_function,
+        ),
+        strict_content_type=get_value_or_default(
+            route.strict_content_type,
+            include_context.included_router.strict_content_type,
+            include_context.strict_content_type,
+        ),
+        stream_item_type=route.stream_item_type,
+    )
+
+    def _app(self: Any) -> Any:
+        # Build the handler lazily with the effective context active, mirroring
+        # upstream's ContextVar usage so integrations wrapping dependant.call
+        # while constructing the handler still see the context.
+        context_var = getattr(routing, "_effective_route_context_var", None)
+        if context_var is not None:
+            token = context_var.set(self)
+            try:
+                handler = self.original_route.get_route_handler()
+            finally:
+                context_var.reset(token)
+        else:
+            handler = self.original_route.get_route_handler()
+        return routing.request_response(handler)
+
+    _add_cache_attribute(context, "app", _app)
+    return context
+
+
+def apply_include_patch(routing_module: Any) -> bool:
+    """Patch fastapi>=0.162's include machinery to defer app construction.
+
+    Returns True when the patch was applied, i.e. the running fastapi version
+    has `_EffectiveRouteContext` (older versions re-run APIRoute.__init__ on
+    include, which the route-class patch already covers).
+    """
+    effective_route_context = getattr(routing_module, "_EffectiveRouteContext", None)
+    if effective_route_context is None:
+        return False
+    effective_route_context.from_api_route = classmethod(_from_api_route_deferred)
+    return True
