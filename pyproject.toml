@@ -8,16 +8,16 @@ requires-python = ">=3.10"
 readme = "README.md"
 license = { text = "MIT" }
 classifiers = [
-    "Environment :: Plugins",
-    "Framework :: FastAPI",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
-    "Typing :: Typed",
+  "Environment :: Plugins",
+  "Framework :: FastAPI",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Typing :: Typed",
 ]
 dynamic = ["version"]
 
@@ -31,14 +31,17 @@ build-backend = "pdm.backend"
 
 [tool]
 [tool.pdm]
-ignore_package_warnings = ["pre-commit"]
 plugins = ["sync-pre-commit-lock"]
 
 [tool.pdm.scripts]
 test = "pytest tests"
-full_test = {shell= "pytest tests", env= {FULL_TEST = "true"}}
-benchmark = {shell= "pytest tests --benchmark-json benchmark.json", env= {FULL_TEST = "true"}}
-post_install = {composite = ["pre-commit install", "pdm install --plugins --frozen-lock", "pip install ./fastapi"]}
+full_test = { shell = "pytest tests", env = { FULL_TEST = "true" } }
+benchmark = { shell = "pytest tests --benchmark-json benchmark.json", env = { FULL_TEST = "true" } }
+post_install = { composite = [
+  "prek install",
+  "pdm install --plugins --frozen-lock",
+  "pip install ./fastapi",
+] }
 
 
 [tool.isort]
@@ -52,13 +55,13 @@ all = true
 
 [dependency-groups]
 dev = [
-    "pytest>=9.1.1",
-    "ruff>=0.17.1",
-    "pre-commit>=4.3.0",
-    "mypy>=2.4.0",
-    "tuna>=0.5.15",
-    "pytest-benchmark>=5.3.0",
-    "pip>=26.2.1",
-    "inline-snapshot>=0.36.1",
-    "httpx2>=2.14.0",
+  "pytest>=9.1.1",
+  "ruff>=0.17.1",
+  "mypy>=2.4.0",
+  "tuna>=0.5.15",
+  "pytest-benchmark>=5.3.0",
+  "pip>=26.2.1",
+  "inline-snapshot>=0.36.1",
+  "httpx2>=2.14.0",
+  "prek>=0.5.9",
 ]

@@ -17,11 +17,11 @@ repos:
           - --fix
       - id: ruff-format
 
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.1.0
+  - repo: https://github.com/oxc-project/mirrors-oxfmt
+    rev: v0.74.0
     hooks:
-      - id: prettier
-        additional_dependencies: [prettier@latest, prettier-plugin-toml@latest]
+      - id: oxfmt
+        types_or: [javascript, jsx, ts, tsx, json, yaml, toml, markdown]
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: "v2.4.0"
     hooks:
