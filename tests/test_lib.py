@@ -8,25 +8,15 @@ from fastapi import APIRouter, FastAPI, routing
 from fastapi_deferred_init.routing import (
     DeferringAPIRoute,
     DeferringAPIRouter,
-    _populate_api_route_state,
 )
 
 from .data.gen_code_ast import create_code
-from .helpers import import_via_file_path, load_code
+from .helpers import apply_monkeypatch, import_via_file_path, load_code
 
 
 def skip_test(use_lib: bool):
     if not use_lib and not os.getenv("FULL_TEST"):
         pytest.skip()
-
-
-def apply_monkeypatch(monkeypatch):
-    monkeypatch.setattr(
-        "fastapi.routing._populate_api_route_state", _populate_api_route_state
-    )
-    monkeypatch.setattr("fastapi.routing.APIRoute", DeferringAPIRoute)
-    monkeypatch.setattr("fastapi.routing.APIRouter", DeferringAPIRouter)
-    monkeypatch.setattr("fastapi.APIRouter", DeferringAPIRouter)
 
 
 @pytest.mark.parametrize(["use_lib"], [(True,), (False,)])

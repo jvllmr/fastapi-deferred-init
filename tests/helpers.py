@@ -5,6 +5,16 @@ import sys
 from contextlib import contextmanager
 from cProfile import Profile
 from pstats import SortKey, Stats
+from typing import TYPE_CHECKING
+
+from fastapi_deferred_init.routing import (
+    DeferringAPIRoute,
+    DeferringAPIRouter,
+    _populate_api_route_state,
+)
+
+if TYPE_CHECKING:
+    import pytest
 
 
 @contextmanager
@@ -29,3 +39,12 @@ def import_via_file_path(module_name: str, file_path: str):
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
     spec.loader.exec_module(module)
+
+
+def apply_monkeypatch(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "fastapi.routing._populate_api_route_state", _populate_api_route_state
+    )
+    monkeypatch.setattr("fastapi.routing.APIRoute", DeferringAPIRoute)
+    monkeypatch.setattr("fastapi.routing.APIRouter", DeferringAPIRouter)
+    monkeypatch.setattr("fastapi.APIRouter", DeferringAPIRouter)

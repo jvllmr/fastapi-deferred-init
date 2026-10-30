@@ -125,10 +125,16 @@ def _populate_api_route_state(
         status_code = int(status_code)
     route.status_code = status_code
 
+    # Store the raw response_model / stream_item_type parameters so the
+    # deferred cached_properties can access them per-instance (not via
+    # closure, which would be shared across all instances of the class).
+    route._raw_response_model = response_model  # type: ignore[attr-defined]
+    route._raw_stream_item_type = stream_item_type  # type: ignore[attr-defined]
+
     def _response_field(self):
         if self.response_model:
-            assert is_body_allowed_for_status_code(status_code), (
-                f"Status code {status_code} must not have a response body"
+            assert is_body_allowed_for_status_code(self.status_code), (
+                f"Status code {self.status_code} must not have a response body"
             )
             response_name = "Response_" + self.unique_id
             return create_model_field(
@@ -234,11 +240,10 @@ def _populate_api_route_state(
     _add_cache_attribute(route, "is_json_stream", _is_json_stream)
 
     def _resolved_response_model_stream_item(self):
-        nonlocal response_model, stream_item_type
-        resolved_model = response_model
-        resolved_item_type = stream_item_type
-        if isinstance(response_model, DefaultPlaceholder):
-            return_annotation = get_typed_return_annotation(endpoint)
+        resolved_model = self._raw_response_model
+        resolved_item_type = self._raw_stream_item_type
+        if isinstance(resolved_model, DefaultPlaceholder):
+            return_annotation = get_typed_return_annotation(self.endpoint)
             if lenient_issubclass(return_annotation, Response):
                 resolved_model = None
             else:
@@ -251,8 +256,8 @@ def _populate_api_route_state(
                     # wrapper, not a data model, so it shouldn't feed
                     # into validation or OpenAPI schema generation.
                     if (
-                        isinstance(response_class, DefaultPlaceholder)
-                        or lenient_issubclass(response_class, EventSourceResponse)
+                        isinstance(self.response_class, DefaultPlaceholder)
+                        or lenient_issubclass(self.response_class, EventSourceResponse)
                     ) and not lenient_issubclass(stream_item, ServerSentEvent):
                         resolved_item_type = stream_item
                     resolved_model = None
