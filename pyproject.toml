@@ -4,7 +4,7 @@ description = "Faster FastAPI start-up time for Projects with many nested router
 keywords = ["fastapi", "speed", "router", "startup", "optimization"]
 authors = [{ name = "Jan Vollmer", email = "jan@vllmr.dev" }]
 dependencies = ["fastapi>=0.146.0"]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 readme = "README.md"
 license = { text = "MIT" }
 classifiers = [
@@ -12,11 +12,11 @@ classifiers = [
   "Framework :: FastAPI",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: MIT License",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
   "Typing :: Typed",
 ]
 dynamic = ["version"]
@@ -47,14 +47,17 @@ post_install = { composite = [
 [tool.isort]
 profile = "black"
 
+[tool.ruff]
+target-version = "py311"
+
+[tool.ruff.lint]
+extend-select = ["F"]
+
 [tool.pdm.version]
 source = "scm"
 
-[tool.pycln]
-all = true
-
 [tool.ty.environment]
-python-version = "3.10"
+python-version = "3.11"
 python = ".venv"
 
 [tool.ty.src]

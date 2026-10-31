@@ -4,13 +4,13 @@ repos:
     hooks:
       - id: pyupgrade
         args:
-          - --py39-plus
+          - --py311-plus
   - repo: https://github.com/jvllmr/pyaphid
     rev: v0.3.1
     hooks:
       - id: pyaphid
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.17.1"
+    rev: "v0.17.3"
     hooks:
       - id: ruff
         args:
