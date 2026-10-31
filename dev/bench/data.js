@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793405832362,
+  "lastUpdate": 1793406110433,
   "repoUrl": "https://github.com/jvllmr/fastapi-deferred-init",
   "entries": {
     "Benchmark": [
@@ -4931,6 +4931,44 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 3.5318021295805155",
             "extra": "mean: 22.039134857599997 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jan@vllmr.dev",
+            "name": "Jan Vollmer",
+            "username": "jvllmr"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "77ac017857bee14ebf971ce1db98039aead28321",
+          "message": "chore(renovate): group dev dependencies (#120)\n\nDev deps live in pyproject [dependency-groups]; match that depType\nso Renovate opens them as a separate \"dev dependencies\" group PR\ninstead of mixing with runtime deps like fastapi.",
+          "timestamp": "2026-10-31T00:16:28Z",
+          "tree_id": "02a8ba2b06fb37560b3b66309e5310f600e41692",
+          "url": "https://github.com/jvllmr/fastapi-deferred-init/commit/77ac017857bee14ebf971ce1db98039aead28321"
+        },
+        "date": 1793406109977,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_lib.py::test_basic[True]",
+            "value": 3.802557298572266,
+            "unit": "iter/sec",
+            "range": "stddev: 0.030150969434699897",
+            "extra": "mean: 262.98091560000074 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_lib.py::test_basic[False]",
+            "value": 0.04595512259396354,
+            "unit": "iter/sec",
+            "range": "stddev: 4.763066156783415",
+            "extra": "mean: 21.760359750000003 sec\nrounds: 5"
           }
         ]
       }
