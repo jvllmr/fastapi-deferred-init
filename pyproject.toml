@@ -65,7 +65,7 @@ include = ["src", "tests"]
 
 [dependency-groups]
 dev = [
-  "pytest>=9.1.1",
+  "pytest>=9.1.1,<9.2",
   "ruff>=0.17.1",
   "tuna>=0.5.15",
   "pytest-benchmark>=5.3.0",
