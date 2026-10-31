@@ -15,6 +15,11 @@
   },
   "packageRules": [
     {
+      "description": "Group dev dependencies into their own update group",
+      "matchDepTypes": ["dependency-groups"],
+      "groupName": "dev dependencies"
+    },
+    {
       "description": "Do not update requires-python",
       "matchDepTypes": ["requires-python"],
       "enabled": false
