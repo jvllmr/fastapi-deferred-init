@@ -66,12 +66,12 @@ include = ["src", "tests"]
 [dependency-groups]
 dev = [
   "pytest>=9.2.0,<9.3",
-  "ruff>=0.17.4",
+  "ruff>=0.17.6",
   "tuna>=0.5.15",
   "pytest-benchmark>=5.3.1",
   "pip>=26.3",
-  "inline-snapshot>=0.36.1",
-  "httpx2>=2.16.0",
-  "prek>=0.5.10",
-  "ty>=0.0.99",
+  "inline-snapshot>=0.37.0",
+  "httpx2>=2.16.2",
+  "prek>=0.5.12",
+  "ty>=0.0.112",
 ]
