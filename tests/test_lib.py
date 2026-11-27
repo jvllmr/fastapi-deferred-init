@@ -114,7 +114,7 @@ def test_fastapi_sse(monkeypatch):
         "fastapi/tests/test_sse.py",
     )
 
-    from fastapi_clone.tests.test_sse import (  # ty: ignore[unresolved-import]
+    from fastapi_clone.tests.test_sse import (  # ty: ignore[import-not-found]
         client_fixture as fastapi_client_fixture,
     )
     from fastapi_clone.tests.test_sse import (  # type: ignore
